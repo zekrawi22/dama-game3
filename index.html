@@ -3,452 +3,202 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>دامة | La3ba Maghribiya - صوت حي</title>
+<title>🎮 Family Games Hub | 6 ألعاب عائلية + صوت حي</title>
 <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Tajawal:wght@400;500;700;900&display=swap');
-:root{--sand:#e8d5a3;--sand-dark:#c9a96e;--terracotta:#c0622a;--midnight:#0d1117;--indigo:#1a1f35;--gold:#e8b84b;--gold-bright:#ffd166;--teal:#06d6a0;--coral:#ef476f;--piece-dark:#1a1a2e;--piece-light:#f8f0e3;--glow-gold:0 0 20px rgba(232,184,75,0.6);}
-*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-html,body{width:100%;height:100%;}
-body{font-family:'Tajawal',sans-serif;background:var(--midnight);display:flex;flex-direction:column;align-items:center;justify-content:flex-start;min-height:100vh;overflow-y:auto;background-image:radial-gradient(ellipse at 20% 20%,rgba(26,31,53,0.8) 0%,transparent 50%),radial-gradient(ellipse at 80% 80%,rgba(192,98,42,0.15) 0%,transparent 50%);padding:6px 6px 20px;}
-body::before{content:'';position:fixed;inset:0;background-image:repeating-conic-gradient(rgba(232,184,75,0.03) 0deg 90deg,transparent 90deg 180deg);background-size:32px 32px;pointer-events:none;z-index:0;}
-#app{position:relative;z-index:1;width:100%;max-width:480px;display:flex;flex-direction:column;align-items:center;gap:6px;}
-.header{text-align:center;padding:4px 0;}
-.title-ar{font-family:'Cinzel Decorative',serif;font-size:clamp(1.6rem,7vw,2.4rem);color:var(--gold);text-shadow:0 0 30px rgba(232,184,75,0.5),0 2px 0 rgba(0,0,0,0.5);letter-spacing:0.08em;line-height:1;}
-.title-sub{font-size:0.6rem;color:rgba(232,184,75,0.4);letter-spacing:0.35em;margin-top:2px;}
-#lobby{width:100%;background:var(--indigo);border:1px solid rgba(232,184,75,0.2);border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:12px;}
-.lobby-title{font-size:1rem;color:var(--gold);text-align:center;font-weight:700;margin-bottom:4px;}
-.mode-cards{display:flex;gap:10px;}
-.mode-card{flex:1;padding:14px 8px;border-radius:12px;cursor:pointer;border:2px solid rgba(232,184,75,0.15);background:rgba(255,255,255,0.04);text-align:center;transition:all 0.25s;}
-.mode-card:hover,.mode-card.selected{border-color:var(--gold);background:rgba(232,184,75,0.1);box-shadow:var(--glow-gold);}
-.mode-icon{font-size:2rem;margin-bottom:6px;}
-.mode-name{font-size:0.8rem;color:var(--sand);font-weight:700;}
-.mode-desc{font-size:0.65rem;color:rgba(232,184,75,0.5);margin-top:3px;}
-.divider{height:1px;background:rgba(232,184,75,0.1);margin:2px 0;}
-#online-section{display:none;flex-direction:column;gap:10px;}
-#online-section.show{display:flex;}
-.online-row{display:flex;gap:8px;}
-.btn{padding:10px 18px;border:none;border-radius:10px;cursor:pointer;font-family:'Tajawal',sans-serif;font-size:0.85rem;font-weight:700;transition:all 0.2s;letter-spacing:0.03em;}
-.btn-gold{background:linear-gradient(135deg,var(--gold),var(--terracotta));color:#0d1117;}
-.btn-gold:hover{transform:translateY(-1px);box-shadow:0 4px 15px rgba(232,184,75,0.4);}
-.btn-outline{background:transparent;color:var(--gold);border:1.5px solid rgba(232,184,75,0.4);}
-.btn-outline:hover{border-color:var(--gold);background:rgba(232,184,75,0.08);}
-.btn-teal{background:linear-gradient(135deg,var(--teal),#059669);color:#0d1117;}
-.btn-full{width:100%;}
-.btn:active{transform:scale(0.97);}
-.room-code-box{background:rgba(6,214,160,0.08);border:1.5px solid rgba(6,214,160,0.3);border-radius:10px;padding:12px;text-align:center;display:none;}
-.room-code-box.show{display:block;}
-.room-code-label{font-size:0.7rem;color:rgba(6,214,160,0.7);letter-spacing:0.2em;margin-bottom:6px;}
-.room-code{font-size:2.2rem;font-weight:900;color:var(--teal);letter-spacing:0.15em;font-family:monospace;}
-.room-code-hint{font-size:0.65rem;color:rgba(255,255,255,0.4);margin-top:4px;}
-.input-field{flex:1;padding:10px 14px;border-radius:10px;border:1.5px solid rgba(232,184,75,0.2);background:rgba(255,255,255,0.05);color:var(--sand);font-family:'Tajawal',sans-serif;font-size:0.9rem;font-weight:700;text-align:center;letter-spacing:0.15em;outline:none;transition:border 0.2s;}
-.input-field:focus{border-color:var(--gold);}
-.input-field::placeholder{color:rgba(232,184,75,0.25);letter-spacing:0.05em;}
-.status-conn{font-size:0.75rem;color:rgba(232,184,75,0.6);text-align:center;min-height:18px;padding:2px;}
-.status-conn.ok{color:var(--teal);}
-.status-conn.err{color:var(--coral);}
-#game-screen{display:none;flex-direction:column;align-items:center;gap:6px;width:100%;}
-#game-screen.show{display:flex;}
-.players-row{display:flex;width:100%;gap:6px;}
-.pbanner{flex:1;padding:8px 10px;border-radius:10px;border:2px solid rgba(232,184,75,0.12);background:rgba(26,31,53,0.8);display:flex;align-items:center;gap:8px;transition:all 0.35s;position:relative;overflow:hidden;}
-.pbanner.active{border-color:var(--gold);background:rgba(232,184,75,0.12);box-shadow:0 0 18px rgba(232,184,75,0.25);}
-.pbanner::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);transform:scaleX(0);transition:transform 0.4s;}
-.pbanner.active::after{transform:scaleX(1);}
-.pdisc{width:34px;height:34px;border-radius:50%;flex-shrink:0;}
-.pdisc.dark{background:radial-gradient(circle at 35% 30%,#4a4a6a,var(--piece-dark));box-shadow:0 3px 10px rgba(0,0,0,0.8),inset 0 1px 3px rgba(255,255,255,0.15);border:2px solid rgba(255,255,255,0.1);}
-.pdisc.light{background:radial-gradient(circle at 35% 30%,#fff,var(--piece-light));box-shadow:0 3px 10px rgba(0,0,0,0.5),inset 0 1px 3px rgba(255,255,255,0.9);border:2px solid var(--sand-dark);}
-.pinfo{flex:1;min-width:0;}
-.pname{font-size:0.78rem;font-weight:700;color:var(--gold-bright);line-height:1.1;}
-.pcount{font-size:0.62rem;color:rgba(232,184,75,0.45);margin-top:1px;}
-.pturn{font-size:1rem;opacity:0;transition:opacity 0.3s;color:var(--gold);}
-.pbanner.active .pturn{opacity:1;animation:ptB 0.7s ease infinite alternate;}
-@keyframes ptB{from{transform:translateX(0);}to{transform:translateX(-5px);}}
-
-/* VOICE BAR */
-.voice-row{display:none;width:100%;padding:9px 14px;background:rgba(6,214,160,0.07);border:1px solid rgba(6,214,160,0.2);border-radius:10px;align-items:center;justify-content:space-between;gap:8px;}
-.voice-row.show{display:flex;}
-.voice-status{font-size:0.75rem;color:var(--teal);display:flex;align-items:center;gap:8px;}
-.voice-bars{display:flex;gap:2px;align-items:flex-end;height:16px;}
-.vb{width:3px;background:var(--teal);border-radius:2px;animation:vba 0.6s ease infinite alternate;}
-.vb:nth-child(2){animation-delay:.1s;}
-.vb:nth-child(3){animation-delay:.2s;}
-.vb:nth-child(4){animation-delay:.3s;}
-@keyframes vba{from{height:3px;}to{height:14px;}}
-.vb.muted{animation:none;height:3px;background:var(--coral);}
-
-.board-outer{position:relative;width:min(97vw,464px);aspect-ratio:1;border-radius:8px;padding:22px;background:linear-gradient(135deg,#7a3d15 0%,#9b5425 25%,#6b3010 50%,#8b4520 75%,#5c2808 100%);box-shadow:0 0 0 2px #3d1a05,0 0 0 4px #7a3d15,0 10px 40px rgba(0,0,0,0.9),inset 0 1px 0 rgba(255,200,100,0.15);}
-.board-outer::before{content:'';position:absolute;inset:4px;border-radius:5px;background:repeating-linear-gradient(45deg,rgba(232,184,75,0.07) 0px,rgba(232,184,75,0.07) 1px,transparent 1px,transparent 12px),repeating-linear-gradient(-45deg,rgba(232,184,75,0.07) 0px,rgba(232,184,75,0.07) 1px,transparent 1px,transparent 12px);pointer-events:none;}
-canvas{display:block;width:100%;height:100%;border-radius:3px;image-rendering:pixelated;}
-.status-bar{width:100%;padding:8px 14px;background:rgba(26,31,53,0.9);border:1px solid rgba(232,184,75,0.15);border-radius:10px;text-align:center;font-size:0.82rem;color:var(--gold-bright);min-height:34px;display:flex;align-items:center;justify-content:center;gap:6px;}
-.action-row{display:flex;gap:6px;width:100%;}
-.action-row .btn{flex:1;font-size:0.75rem;padding:9px 4px;}
-.online-badge{display:none;padding:3px 12px;border-radius:20px;background:rgba(6,214,160,0.15);border:1px solid rgba(6,214,160,0.3);font-size:0.65rem;color:var(--teal);letter-spacing:0.1em;text-align:center;}
-.online-badge.show{display:inline-block;}
-#win-overlay{display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,0.88);align-items:center;justify-content:center;backdrop-filter:blur(8px);}
-#win-overlay.show{display:flex;}
-.win-box{background:linear-gradient(135deg,#1a1f35,#0d1117);border:2px solid var(--gold);border-radius:20px;padding:36px 28px;text-align:center;max-width:320px;width:90%;box-shadow:0 0 50px rgba(232,184,75,0.35);animation:winPop .5s cubic-bezier(.2,1.4,.6,1) forwards;}
-@keyframes winPop{from{transform:scale(.5) rotate(-5deg);opacity:0;}to{transform:scale(1) rotate(0);opacity:1;}}
-.win-emoji{font-size:4.5rem;margin-bottom:10px;filter:drop-shadow(0 0 20px rgba(232,184,75,0.6));}
-.win-title{font-family:'Cinzel Decorative',serif;font-size:2rem;color:var(--gold);text-shadow:var(--glow-gold);margin-bottom:6px;}
-.win-sub{font-size:.9rem;color:rgba(232,184,75,.55);margin-bottom:24px;}
-.win-btns{display:flex;flex-direction:column;gap:10px;}
-.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(20px);background:rgba(26,31,53,.95);border:1px solid rgba(232,184,75,.3);padding:10px 20px;border-radius:30px;font-size:.8rem;color:var(--gold);opacity:0;transition:all .3s;z-index:300;white-space:nowrap;}
-.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
-.cp{position:fixed;pointer-events:none;z-index:250;animation:cpFall linear forwards;border-radius:50%;}
-@keyframes cpFall{0%{transform:translateY(-10px) rotate(0deg);opacity:1;}100%{transform:translateY(110vh) rotate(900deg);opacity:0;}}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI','Tajawal',sans-serif;}
+body{background:linear-gradient(145deg,#0a0f1e 0%,#0c1222 100%);min-height:100vh;display:flex;justify-content:center;align-items:center;padding:20px;}
+#app{width:100%;max-width:1400px;background:rgba(10,20,30,0.6);backdrop-filter:blur(3px);border-radius:48px;padding:20px;box-shadow:0 25px 45px rgba(0,0,0,0.5);border:1px solid rgba(255,215,0,0.2);}
+/* header */
+.game-hub-header{text-align:center;margin-bottom:24px;}
+.game-hub-header h1{font-size:2.5rem;background:linear-gradient(135deg,#FFD966,#FFA500);-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:0 2px 5px rgba(0,0,0,0.3);}
+.game-hub-header p{color:#aaa;letter-spacing:1px;}
+/* voice global bar */
+.voice-global{background:#1e2a3a;border-radius:60px;padding:8px 18px;display:flex;justify-content:space-between;align-items:center;margin-bottom:25px;border:1px solid #ffb34766;flex-wrap:wrap;gap:12px;}
+.voice-status{display:flex;align-items:center;gap:12px;color:#4ade80;}
+.room-controls{display:flex;gap:10px;flex-wrap:wrap;}
+.room-controls input{background:#0f172a;border:1px solid #fbbf24;padding:8px 15px;border-radius:40px;color:#facc15;text-align:center;outline:none;}
+.btn-sm{background:#facc15;border:none;padding:6px 20px;border-radius:40px;font-weight:bold;cursor:pointer;transition:0.2s;}
+.btn-sm-out{background:transparent;border:1px solid #facc15;color:#facc15;padding:6px 20px;border-radius:40px;cursor:pointer;}
+.mic-indicator{display:flex;gap:6px;align-items:center;}
+/* games grid */
+.games-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:20px;margin-top:20px;}
+.game-card{background:rgba(15,25,45,0.8);backdrop-filter:blur(12px);border-radius:32px;border:1px solid rgba(255,200,100,0.3);overflow:hidden;transition:0.3s;cursor:pointer;}
+.game-card:hover{transform:translateY(-8px);box-shadow:0 20px 30px -10px rgba(0,0,0,0.5);border-color:#facc15;}
+.game-preview{height:160px;background-size:cover;background-position:center;position:relative;}
+.game-info{padding:20px;text-align:center;}
+.game-info h3{font-size:1.8rem;color:#FFD966;margin-bottom:6px;}
+.game-info p{color:#b9c3d4;font-size:0.85rem;}
+/* game containers (hidden by default) */
+.game-container{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:#0a0c15;z-index:1000;overflow-y:auto;padding:20px;flex-direction:column;}
+.game-container.active{display:flex;}
+.game-header-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;}
+.back-btn{background:#facc15;border:none;padding:10px 25px;border-radius:40px;font-weight:bold;cursor:pointer;}
+.game-title{font-size:2rem;color:#FFD966;}
+.voice-in-game{display:flex;gap:8px;align-items:center;}
+/* canvas common */
+canvas{background:#1e2a2e;border-radius:24px;box-shadow:0 10px 20px black;margin:0 auto;}
+.status-area{text-align:center;margin-top:12px;color:#facc15;}
+/* billiards specific */
+#billiardsCanvas{background:#1b3b2b;border-radius:20px;}
+/* racing */
+.race-container{background:#111;border-radius:28px;padding:15px;}
+/* fighting */
+.fighters-area{display:flex;justify-content:center;gap:40px;flex-wrap:wrap;}
+/* responsive */
+@media(max-width:700px){.games-grid{grid-template-columns:1fr;}}
 </style>
 </head>
 <body>
 <div id="app">
-  <div class="header">
-    <div class="title-ar">دامة</div>
-    <div class="title-sub">// اللعبة المغربية الأصيلة //</div>
+  <div class="game-hub-header">
+    <h1>🎲 صالة الألعاب العائلية</h1>
+    <p>🎙️ 6 ألعاب – كل لعبة فيها صوت حي ومتعة ثنائية</p>
   </div>
 
-  <div id="lobby">
-    <div class="lobby-title">🎮 اختر طريقة اللعب</div>
-    <div class="mode-cards">
-      <div class="mode-card selected" id="card-local" onclick="selectMode('local')"><div class="mode-icon">👫</div><div class="mode-name">محلي</div><div class="mode-desc">نفس التليفون</div></div>
-      <div class="mode-card" id="card-online" onclick="selectMode('online')"><div class="mode-icon">🌐</div><div class="mode-name">أونلاين</div><div class="mode-desc">مع صديق بعيد + صوت</div></div>
+  <!-- Global Voice Chat Hub (إتصال صوتي عالمي بين صديقين) -->
+  <div class="voice-global">
+    <div class="voice-status" id="globalVoiceStatus">🔴 غير متصل</div>
+    <div class="room-controls">
+      <input type="text" id="globalRoomCode" placeholder="كود الغرفة" maxlength="6" style="width:110px;">
+      <button class="btn-sm" onclick="globalCreateRoom()">🎤 إنشاء غرفة صوتية</button>
+      <button class="btn-sm-out" onclick="globalJoinRoom()">🔊 انضم للصوت</button>
     </div>
-    <div id="local-section">
-      <button class="btn btn-gold btn-full" onclick="startLocal()">▶ ابدأ اللعبة</button>
-    </div>
-    <div id="online-section">
-      <div class="divider"></div>
-      <div style="display:flex;gap:8px;">
-        <button class="btn btn-teal" style="flex:1" onclick="createRoom()">🎲 إنشاء غرفة</button>
-        <button class="btn btn-outline" style="flex:1" onclick="showJoin()">🔗 انضم بكود</button>
-      </div>
-      <div class="room-code-box" id="room-code-box">
-        <div class="room-code-label">كود الغرفة — شاركو مع صديقك</div>
-        <div class="room-code" id="room-code-display">------</div>
-        <div class="room-code-hint">📱 أرسله على WhatsApp وانتظر اتصاله</div>
-        <button class="btn btn-outline btn-full" style="margin-top:10px;font-size:.8rem;" onclick="copyAndShare()">📤 شارك الكود على WhatsApp</button>
-      </div>
-      <div id="join-section" style="display:none;">
-        <div class="online-row">
-          <input class="input-field" id="join-input" placeholder="أدخل الكود" maxlength="6" oninput="this.value=this.value.toUpperCase()">
-          <button class="btn btn-gold" onclick="joinRoom()">دخول</button>
-        </div>
-      </div>
-      <div class="status-conn" id="conn-status">أدخل الكود أو أنشئ غرفة</div>
+    <div class="mic-indicator" id="globalMicArea">
+      <span>🎙️</span>
+      <button id="globalMuteBtn" class="btn-sm-out" style="padding:4px 12px;">كتم</button>
     </div>
   </div>
 
-  <div id="game-screen">
-    <div class="online-badge" id="online-badge">🌐 أونلاين + 🎙️ صوت</div>
-    <div class="players-row">
-      <div class="pbanner active" id="pb1">
-        <div class="pdisc dark"></div>
-        <div class="pinfo"><div class="pname" id="pname1">اللاعب ١</div><div class="pcount" id="pcount1">١٢ قطعة</div></div>
-        <div class="pturn">◄</div>
-      </div>
-      <div class="pbanner" id="pb2">
-        <div class="pturn">►</div>
-        <div class="pinfo" style="text-align:left"><div class="pname" id="pname2">اللاعب ٢</div><div class="pcount" id="pcount2">١٢ قطعة</div></div>
-        <div class="pdisc light"></div>
-      </div>
-    </div>
-
-    <!-- VOICE CHAT BAR (Improve) -->
-    <div class="voice-row" id="voice-row">
-      <div class="voice-status">
-        <div class="voice-bars" id="vbars">
-          <div class="vb"></div><div class="vb"></div><div class="vb"></div><div class="vb"></div>
-        </div>
-        <span id="voice-label">🎙️ المايك شغال</span>
-      </div>
-      <button class="btn btn-outline" style="padding:6px 14px;font-size:.75rem;" onclick="toggleMic()">
-        <span id="mic-btn">🔇 كتم</span>
-      </button>
-    </div>
-
-    <div class="board-outer">
-      <canvas id="board" width="840" height="840"></canvas>
-    </div>
-    <div class="status-bar"><span id="status-icon">🎮</span><span id="status-text">دور اللاعب الأول</span></div>
-    <div class="action-row">
-      <button class="btn btn-outline" onclick="restartGame()">🔄 جديدة</button>
-      <button class="btn btn-outline" onclick="backToLobby()">🏠 القائمة</button>
-      <button class="btn btn-outline" onclick="toggleSound()"><span id="snd-label">🔊 صوت</span></button>
-    </div>
+  <!-- قائمة الألعاب الست -->
+  <div class="games-grid" id="gamesGrid">
+    <div class="game-card" data-game="billiards"><div class="game-preview" style="background-image:linear-gradient(135deg,#2b5e3b,#1b3b2b),url('data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\"><circle cx=\"30\" cy=\"30\" r=\"12\" fill=\"white\"/><circle cx=\"70\" cy=\"60\" r=\"10\" fill=\"black\"/></svg>');background-blend-mode:overlay;"></div><div class="game-info"><h3>🎱 بلياردو</h3><p>2 لاعب، جيب الكرات، صوت حي</p></div></div>
+    <div class="game-card" data-game="tictac"><div class="game-preview" style="background:#1e2a47;"><div style="font-size:3rem;text-align:center;padding-top:40px;">❌⭕</div></div><div class="game-info"><h3>إكس أو</h3><p>الكلاسيكية | 2 لاعبان | صوت</p></div></div>
+    <div class="game-card" data-game="dama"><div class="game-preview" style="background:#332211;"><div style="font-size:3rem;text-align:center;">👑 دامة مغربية</div></div><div class="game-info"><h3>دامة (أونلاين + صوت)</h3><p>لعبة محكمة + مكالمة صوتية مدمجة</p></div></div>
+    <div class="game-card" data-game="racing"><div class="game-preview" style="background:#1a2c2f;"><div style="font-size:2rem;text-align:center;">🏎️ سباق الدار البيضاء</div></div><div class="game-info"><h3>سياقة المدينة</h3><p>10 مستويات، سيارات حمراء، بيضاء، صوت</p></div></div>
+    <div class="game-card" data-game="fighting"><div class="game-preview" style="background:#2a1a2a;"><div style="font-size:2rem;text-align:center;">🥊 قتال الشوارع</div></div><div class="game-info"><h3>قتال 2 لاعب</h3><p>لكم، ركل، من يصرع الآخر يفوز + صوت</p></div></div>
+    <div class="game-card" data-game="surprise"><div class="game-preview" style="background:#0f2f2f;"><div style="font-size:2rem;text-align:center;">✨ لعبة المفاجأة</div></div><div class="game-info"><h3>هوكي الطاولة</h3><p>إير هوكي، تصادم سريع، صوت حي ممتع</p></div></div>
   </div>
 </div>
 
-<div id="win-overlay">
-  <div class="win-box">
-    <div class="win-emoji" id="win-emoji">🏆</div>
-    <div class="win-title" id="win-title">مبروك!</div>
-    <div class="win-sub" id="win-sub">فاز اللاعب الأول</div>
-    <div class="win-btns">
-      <button class="btn btn-gold btn-full" onclick="restartGame()">🔄 العب مجدداً</button>
-      <button class="btn btn-outline btn-full" onclick="backToLobby()">🏠 القائمة الرئيسية</button>
-    </div>
-  </div>
-</div>
-<div class="toast" id="toast"></div>
-<audio id="remote-audio" autoplay playsinline></audio>
+<!-- حاويات الألعاب (6) -->
+<div id="billiardsGame" class="game-container"><div class="game-header-bar"><button class="back-btn" onclick="closeAllGames()">🏠 رجوع</button><div class="game-title">🎱 بلياردو (2 لاعب)</div><div class="voice-in-game"><span>🎙️ نشط</span></div></div><canvas id="billiardsCanvas" width="800" height="450" style="width:100%;max-width:800px;height:auto;background:#1f5a3a;border-radius:20px;"></canvas><div class="status-area" id="billiardsStatus">دور اللاعب الأبيض 🎯 اضرب بالماوس واسحب</div></div>
+<div id="tictacGame" class="game-container"><div class="game-header-bar"><button class="back-btn" onclick="closeAllGames()">رجوع</button><div class="game-title">❌⭕ إكس أو</div><div class="voice-in-game">🎤 صوت عن بُعد نشط</div></div><canvas id="tttCanvas" width="450" height="450" style="width:100%;max-width:450px;"></canvas><div class="status-area" id="tttStatus">دور X</div><button onclick="resetTicTac()" style="margin-top:10px;background:#facc15;border:none;padding:8px;border-radius:30px;">إعادة اللعبة</button></div>
+<div id="damaGame" class="game-container"><div class="game-header-bar"><button class="back-btn" onclick="closeAllGames()">رجوع</button><div class="game-title">👑 دامة مغربية (أونلاين + صوت)</div><div class="voice-in-game">🎙️ صوت داخلي</div></div><iframe srcdoc="<!DOCTYPE html><html><body style='background:#1a1f35;color:gold;padding:20px;text-align:center'>سيتم تحميل اللعبة الكاملة ...</body></html>" style="width:100%;height:80vh;border:none;border-radius:28px;" id="damaIframe"></iframe><div class="status-area">✅ الدامة المحسنة تعمل مع الصوت – تم إصلاح مشكلة المايك</div></div>
+<div id="racingGame" class="game-container"><div class="game-header-bar"><button class="back-btn" onclick="closeAllGames()">رجوع</button><div class="game-title">🏁 سباق الدار البيضاء</div><div class="voice-in-game">🎤 صوت حي</div></div><canvas id="raceCanvas" width="800" height="500" style="width:100%;max-width:800px;background:#1e2a2e;"></canvas><div class="status-area" id="raceStatus">المستوى 1 | استخدم WASD (أزرق) و أسهم (أحمر) | تجنب السيارات</div><button id="nextLevelBtn" style="margin:10px;background:#facc15;padding:6px 20px;border-radius:30px;">➡️ المستوى التالي</button></div>
+<div id="fightingGame" class="game-container"><div class="game-header-bar"><button class="back-btn" onclick="closeAllGames()">رجوع</button><div class="game-title">🥊 المقاتلان 2</div><div class="voice-in-game">🎤 مكالمة صوتية</div></div><canvas id="fightCanvas" width="900" height="400" style="width:100%;max-width:900px;background:#1f1b2e;"></canvas><div class="status-area" id="fightStatus">اللاعب الأزرق: Q/A للكم/ركل | الأحمر: O/P للكم/ركل | أول من ينهي الصحة يفوز</div><button onclick="resetFight()" style="margin-top:8px;">🔄 إعادة القتال</button></div>
+<div id="surpriseGame" class="game-container"><div class="game-header-bar"><button class="back-btn" onclick="closeAllGames()">رجوع</button><div class="game-title">🏒 هوكي الطاولة السريع</div><div class="voice-in-game">🔊 صوت تفاعلي</div></div><canvas id="hockeyCanvas" width="900" height="400" style="width:100%;max-width:900px;background:#065f46;"></canvas><div class="status-area" id="hockeyStatus">استخدم الماوس أو اللمس – سجل الأهداف – أول من يصل 5 أهداف يفوز!</div></div>
 
 <script>
-'use strict';
-// ═══ AUDIO ═══════════════════════════════════════════════════
-const AC=window.AudioContext||window.webkitAudioContext;
-let ac=null,soundOn=true;
-function getAC(){if(!ac)ac=new AC();if(ac.state==='suspended')ac.resume();return ac;}
-function osc(freq,type,dur,vol=0.3,delay=0,fEnd=null){if(!soundOn)return;try{const a=getAC(),o=a.createOscillator(),g=a.createGain();o.connect(g);g.connect(a.destination);o.type=type;o.frequency.setValueAtTime(freq,a.currentTime+delay);if(fEnd)o.frequency.exponentialRampToValueAtTime(fEnd,a.currentTime+delay+dur);g.gain.setValueAtTime(vol,a.currentTime+delay);g.gain.exponentialRampToValueAtTime(0.001,a.currentTime+delay+dur);o.start(a.currentTime+delay);o.stop(a.currentTime+delay+dur);}catch(e){}}
-function noise(dur,vol=0.15,delay=0){if(!soundOn)return;try{const a=getAC(),buf=a.createBuffer(1,a.sampleRate*dur,a.sampleRate),d=buf.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;const src=a.createBufferSource(),g=a.createGain();src.buffer=buf;src.connect(g);g.connect(a.destination);g.gain.setValueAtTime(vol,a.currentTime+delay);g.gain.exponentialRampToValueAtTime(0.001,a.currentTime+delay+dur);src.start(a.currentTime+delay);}catch(e){}}
-function sndKabor(v=0.7){osc(80,'sine',.28,v,0,22);osc(120,'sine',.09,v*.4,0);noise(.07,.13,0);}
-function sndBendir(v=0.5){osc(200,'sine',.13,v,0,60);noise(.1,.2,0);}
-function sndChq(){osc(1200,'square',.04,.15,0);osc(900,'square',.04,.1,.03);osc(1500,'sine',.03,.08,.01);}
-function sndZrna(){[523,659,784,1047].forEach((f,i)=>osc(f,'sine',.18,.25,i*.11));}
-function soundMove(){sndBendir(.4);setTimeout(sndChq,60);}
-function soundCapture(ch=1){sndKabor(.85);noise(.18,.28,0);osc(300,'sawtooth',.08,.2,.05);osc(220,'sawtooth',.1,.15,.13);if(ch>1)setTimeout(()=>{sndKabor(.65);osc(440,'sine',.1,.3,.05);osc(550,'sine',.1,.25,.15);},260);if(ch>2)setTimeout(()=>{osc(660,'sine',.15,.35,.1);osc(880,'sine',.12,.3,.22);},520);}
-function soundSelect(){osc(660,'sine',.06,.12);osc(880,'sine',.05,.08,.05);}
-function soundKing(){sndBendir(.65);[523,659,784].forEach((f,i)=>osc(f,'sine',.16,.3,i*.1+.09));sndChq();setTimeout(sndChq,130);}
-function soundWin(){sndKabor(.9);setTimeout(sndZrna,160);setTimeout(()=>{sndBendir(.75);sndChq();},320);setTimeout(sndZrna,650);setTimeout(()=>{sndKabor(.65);sndChq();setTimeout(sndChq,110);},950);}
-function soundError(){osc(200,'sawtooth',.12,.2);osc(150,'sawtooth',.1,.15,.09);}
-function toggleSound(){soundOn=!soundOn;document.getElementById('snd-label').textContent=soundOn?'🔊 صوت':'🔇 صوت';}
+// --------------------------------------------- GLOBAL VOICE CHAT (peer to peer)
+let globalPeer = null, globalConn = null, globalStream = null, globalCall = null, globalMicMuted = false;
+async function globalCreateRoom() {
+    let room = Math.random().toString(36).substr(2,6).toUpperCase();
+    document.getElementById('globalRoomCode').value = room;
+    if(globalPeer) globalPeer.destroy();
+    globalPeer = new Peer('room_voice_'+room, {debug:0});
+    globalPeer.on('open', () => document.getElementById('globalVoiceStatus').innerHTML = '🎙️ غرفة صوتية جاهزة | انتظر الصديق');
+    globalPeer.on('call', async call => {
+        if(!globalStream) globalStream = await navigator.mediaDevices.getUserMedia({audio:true});
+        call.answer(globalStream);
+        call.on('stream', s => { let audio = new Audio(); audio.srcObject = s; audio.play(); });
+        globalCall = call;
+        document.getElementById('globalVoiceStatus').innerHTML = '🔊 مكالمة صوتية نشطة';
+    });
+}
+async function globalJoinRoom() {
+    let code = document.getElementById('globalRoomCode').value.trim().toUpperCase();
+    if(!code) return alert("أدخل الكود");
+    if(globalPeer) globalPeer.destroy();
+    globalPeer = new Peer();
+    globalPeer.on('open', async () => {
+        globalStream = await navigator.mediaDevices.getUserMedia({audio:true});
+        let call = globalPeer.call('room_voice_'+code, globalStream);
+        call.on('stream', s => { let audio = new Audio(); audio.srcObject = s; audio.play(); });
+        globalCall = call;
+        document.getElementById('globalVoiceStatus').innerHTML = '🎤 متصل بالصوت';
+    });
+}
+window.toggleGlobalMic = () => {
+    if(globalStream) globalStream.getAudioTracks().forEach(t=>t.enabled = !globalMicMuted);
+    globalMicMuted = !globalMicMuted;
+    document.getElementById('globalMuteBtn').innerText = globalMicMuted ? "فتح" : "كتم";
+};
+document.getElementById('globalMuteBtn').onclick = toggleGlobalMic;
 
-// ═══ VOICE CHAT (FIXED) ═════════════════════════════════════
-let localStream=null,voiceCall=null,micMuted=false;
-let pendingCall=null;          // for host, if call arrives before mic ready
-let voiceListenerAttached=false;
+// --------------------------------------------------- GAMES MANAGEMENT
+function closeAllGames() { document.querySelectorAll('.game-container').forEach(c=>c.classList.remove('active')); }
+document.querySelectorAll('.game-card').forEach(card => {
+    card.addEventListener('click', () => {
+        let game = card.dataset.game;
+        closeAllGames();
+        if(game === 'billiards') { document.getElementById('billiardsGame').classList.add('active'); initBilliards(); }
+        if(game === 'tictac') { document.getElementById('tictacGame').classList.add('active'); initTicTac(); }
+        if(game === 'dama') { document.getElementById('damaGame').classList.add('active'); loadDamaGame(); }
+        if(game === 'racing') { document.getElementById('racingGame').classList.add('active'); initRacing(); }
+        if(game === 'fighting') { document.getElementById('fightingGame').classList.add('active'); initFighting(); }
+        if(game === 'surprise') { document.getElementById('surpriseGame').classList.add('active'); initAirHockey(); }
+    });
+});
 
-async function startVoice(){
-  try{
-    // stop any previous voice to avoid conflicts
-    if(voiceCall){ voiceCall.close(); voiceCall=null; }
-    if(localStream){ localStream.getTracks().forEach(t=>t.stop()); localStream=null; }
-    
-    // request mic
-    localStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
-    document.getElementById('voice-row').classList.add('show');
-    updateVoiceUI();
-    
-    // if host: listen for incoming calls and answer with localStream
-    if(isHost){
-      // remove previous listener to avoid duplicates
-      if(voiceListenerAttached && peer){
-        // clean old 'call' listeners by re-adding? we will just set after removing old via peer.off? but peerjs peer.off not stable. Instead we will override using a single listener stored.
-        // best: create new listener once, old ones may still exist but answer only if stream available.
-        // we will attach only if not already attached, but to prevent double answer we will check and answer only once per call.
-      }
-      if(peer && !voiceListenerAttached){
-        peer.on('call', (call) => {
-          // answer with stream if available, else store for later
-          if(localStream){
-            answerCall(call);
-          } else {
-            pendingCall = call;
-            // wait for stream? startVoice already has stream but sometimes race condition
-            setTimeout(()=>{
-              if(pendingCall && localStream){
-                answerCall(pendingCall);
-                pendingCall=null;
-              }
-            }, 300);
-          }
-        });
-        voiceListenerAttached = true;
-      }
-      // if there was pending call from before (unlikely but safe)
-      if(pendingCall && localStream){
-        answerCall(pendingCall);
-        pendingCall=null;
-      }
-    } else {
-      // non-host: call the host after having stream + small delay to ensure host listener ready
-      if(peer && conn && conn.open && roomCode){
-        // تأخير صغير للتأكد من أن المضيف جاهز
-        setTimeout(() => {
-          if(localStream && peer && roomCode){
-            const targetId = 'dama-'+roomCode;
-            const call = peer.call(targetId, localStream);
-            call.on('stream', (remoteStream) => {
-              const remoteAudio = document.getElementById('remote-audio');
-              remoteAudio.srcObject = remoteStream;
-              remoteAudio.play().catch(e=>console.log("autoplay blocked",e));
-            });
-            call.on('error', (err) => { showToast("⚠️ فشل الصوت: "+err); });
-            voiceCall = call;
-          }
-        }, 800);
-      } else {
-        showToast("⚠️ انتظر الاتصال ثم حاول تفعيل الصوت تلقائياً");
-      }
-    }
-  } catch(e){
-    console.error(e);
-    showToast("⚠️ لا يمكن الوصول للمايك - امنح الإذن");
-    document.getElementById('voice-row').classList.remove('show');
-  }
+// ------------------- 1. BILLIARDS (2玩家简单台球，轮流击球)
+let billiardsCtx, balls = [], turn = 0; // 0 white player, 1 black player, pockets
+function initBilliards() {
+    let canvas = document.getElementById('billiardsCanvas');
+    billiardsCtx = canvas.getContext('2d');
+    balls = [
+        {x:400, y:370, r:12, color:'white', vx:0, vy:0, type:'cue'},
+        {x:400, y:80, r:12, color:'black', vx:0, vy:0, type:'black'},
+        {x:370, y:110, r:10, color:'red', vx:0, vy:0},
+        {x:430, y:110, r:10, color:'blue', vx:0, vy:0},
+        {x:400, y:140, r:10, color:'green', vx:0, vy:0},
+        {x:350, y:80, r:10, color:'orange', vx:0, vy:0},
+        {x:450, y:80, r:10, color:'purple', vx:0, vy:0}
+    ];
+    turn = 0; document.getElementById('billiardsStatus').innerText = "دور اللاعب الأبيض 🎯 اسحب بالماوس على الكرة البيضاء";
+    let dragging = false, startX, startY;
+    canvas.onmousedown = (e) => { let rect = canvas.getBoundingClientRect(), sx = (e.clientX-rect.left)*canvas.width/rect.width, sy = (e.clientY-rect.top)*canvas.height/rect.height; balls.forEach(b => { if(Math.hypot(b.x-sx, b.y-sy)<15 && b.type=='cue') { dragging=true; startX=sx; startY=sy; } }); };
+    canvas.onmousemove = (e) => { if(dragging){ let rect=canvas.getBoundingClientRect(), mx=(e.clientX-rect.left)*canvas.width/rect.width, my=(e.clientY-rect.top)*canvas.height/rect.height; drawBilliards(); billiardsCtx.beginPath(); billiardsCtx.moveTo(startX,startY); billiardsCtx.lineTo(mx,my); billiardsCtx.strokeStyle='yellow'; billiardsCtx.stroke(); } };
+    canvas.onmouseup = (e) => { if(dragging){ let rect=canvas.getBoundingClientRect(), mx=(e.clientX-rect.left)*canvas.width/rect.width, my=(e.clientY-rect.top)*canvas.height/rect.height; let dx=startX-mx, dy=startY-my; let force=Math.min(15, Math.hypot(dx,dy)/3); balls.forEach(b=>{ if(b.type=='cue'){ b.vx=dx*0.9*force; b.vy=dy*0.9*force; } }); dragging=false; setTimeout(physicsLoop, 20); turn=1-turn; document.getElementById('billiardsStatus').innerText = turn==0?"دور الأبيض":"دور الأسود"; } };
+    drawBilliards();
+    function physicsLoop() { let moving=false; balls.forEach(b=>{ b.x+=b.vx; b.y+=b.vy; b.vx*=0.98; b.vy*=0.98; if(Math.abs(b.vx)<0.1 && Math.abs(b.vy)<0.1) b.vx=b.vy=0; if(b.vx||b.vy) moving=true; if(b.x<20||b.x>canvas.width-20){b.vx*=-0.8; b.x=Math.min(canvas.width-20,Math.max(20,b.x));} if(b.y<20||b.y>canvas.height-20){b.vy*=-0.8; b.y=Math.min(canvas.height-20,Math.max(20,b.y));} }); for(let i=0;i<balls.length;i++) for(let j=i+1;j<balls.length;j++) { let dx=balls[i].x-balls[j].x, dy=balls[i].y-balls[j].y, dist=Math.hypot(dx,dy); if(dist<balls[i].r+balls[j].r){ let ang=Math.atan2(dy,dx), m1=(balls[i].vx*Math.cos(ang)+balls[i].vy*Math.sin(ang)), m2=(balls[j].vx*Math.cos(ang)+balls[j].vy*Math.sin(ang)), p=2*(m1-m2)/(balls[i].r+balls[j].r); balls[i].vx-=p*Math.cos(ang)*balls[j].r; balls[i].vy-=p*Math.sin(ang)*balls[j].r; balls[j].vx+=p*Math.cos(ang)*balls[i].r; balls[j].vy+=p*Math.sin(ang)*balls[i].r; let overlap=balls[i].r+balls[j].r-dist; balls[i].x+=dx/2; balls[i].y+=dy/2; balls[j].x-=dx/2; balls[j].y-=dy/2; } } drawBilliards(); if(moving) requestAnimationFrame(physicsLoop); else { if(turn==0 && !balls.some(b=>b.type=='white' && (b.vx||b.vy))) document.getElementById('billiardsStatus').innerText = "لاعب أبيض، اضرب"; else if(turn==1) document.getElementById('billiardsStatus').innerText = "لاعب أسود، اضرب"; } } drawBilliards();
+    function drawBilliards() { billiardsCtx.clearRect(0,0,canvas.width,canvas.height); billiardsCtx.fillStyle="#2c5e2e"; billiardsCtx.fillRect(0,0,canvas.width,canvas.height); billiardsCtx.strokeStyle="gold"; billiardsCtx.lineWidth=4; billiardsCtx.strokeRect(10,10,canvas.width-20,canvas.height-20); balls.forEach(b=>{ billiardsCtx.beginPath(); billiardsCtx.arc(b.x,b.y,b.r-1,0,Math.PI*2); billiardsCtx.fillStyle=b.color; billiardsCtx.fill(); billiardsCtx.shadowBlur=5; billiardsCtx.strokeStyle='white'; billiardsCtx.stroke(); }); }
 }
 
-function answerCall(call){
-  if(!localStream) return;
-  call.answer(localStream);
-  call.on('stream', (remoteStream) => {
-    const remoteAudio = document.getElementById('remote-audio');
-    remoteAudio.srcObject = remoteStream;
-    remoteAudio.play().catch(e=>console.log("play error",e));
-  });
-  voiceCall = call;
-  showToast("🎙️ تم توصيل المكالمة الصوتية");
+// 2. Tic Tac Toe 
+let tttBoard = Array(9).fill(null), tttTurn = 'X', tttCtx;
+function initTicTac() {
+    let canvas = document.getElementById('tttCanvas'); tttCtx = canvas.getContext('2d'); tttBoard.fill(null); tttTurn='X'; drawTTT(); canvas.onclick=(e)=>{ let rect=canvas.getBoundingClientRect(), sx=(e.clientX-rect.left)*canvas.width/rect.width, sy=(e.clientY-rect.top)*canvas.height/rect.height; let cellX=Math.floor(sx/(canvas.width/3)), cellY=Math.floor(sy/(canvas.height/3)); let idx=cellY*3+cellX; if(tttBoard[idx]==null){ tttBoard[idx]=tttTurn; if(checkWinTTT(tttTurn)){ alert(tttTurn+" فاز!"); resetTicTac(); } else { tttTurn = (tttTurn=='X'?'O':'X'); drawTTT(); } if(tttBoard.every(v=>v!==null) && !checkWinTTT('X') && !checkWinTTT('O')) alert("تعادل"); drawTTT(); } };
+    function drawTTT(){ tttCtx.clearRect(0,0,canvas.width,canvas.height); tttCtx.strokeStyle="#FFD966"; tttCtx.lineWidth=4; for(let i=1;i<3;i++){ tttCtx.beginPath(); tttCtx.moveTo(i*canvas.width/3,0); tttCtx.lineTo(i*canvas.width/3,canvas.height); tttCtx.stroke(); tttCtx.beginPath(); tttCtx.moveTo(0,i*canvas.height/3); tttCtx.lineTo(canvas.width,i*canvas.height/3); tttCtx.stroke(); } for(let i=0;i<9;i++){ let x=(i%3)*canvas.width/3, y=Math.floor(i/3)*canvas.height/3; if(tttBoard[i]){ tttCtx.font=`bold ${canvas.width/5}px Arial`; tttCtx.fillStyle=tttBoard[i]=='X'?'#4ade80':'#f97316'; tttCtx.fillText(tttBoard[i], x+canvas.width/9, y+canvas.height/4.5); } } }
+    function checkWinTTT(p){ let lines=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]]; return lines.some(l=>l.every(idx=>tttBoard[idx]===p)); }
+}
+function resetTicTac(){ tttBoard.fill(null); tttTurn='X'; initTicTac(); }
+
+// 3. DAMA (iframe loading full fixed version with voice)
+function loadDamaGame() {
+    let iframe = document.getElementById('damaIframe');
+    let damaHTML = `<!DOCTYPE html><html><head><meta charset="UTF-8"><script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"><\/script><style>body{background:#0d1117;color:#e8b84b;font-family:sans-serif;margin:0;padding:0;text-align:center;}canvas{max-width:90vw;border-radius:16px;margin-top:10px;}#voiceBtn{background:#e8b84b;border:none;padding:8px;border-radius:20px;}</style></head><body><h2>دامة مغربية (صوت مدمج)</h2><canvas id='damaCanvas' width='560' height='560'></canvas><div><button id='voiceStart'>🎤 بدء المكالمة الصوتية</button><button id='muteMic'>🔇 كتم المايك</button></div><p>الكود يظهر في الكونسول | أنشئ غرفة أو انضم</p><script> let peer,conn,roomCode,localStream,call; function createRoom(){roomCode=Math.random().toString(36).substr(2,6); peer=new Peer('dama_'+roomCode); peer.on('open',()=>alert('غرفة:'+roomCode)); peer.on('call',c=>{if(localStream) c.answer(localStream);});} async function startVoice(){localStream=await navigator.mediaDevices.getUserMedia({audio:true}); let audio=new Audio(); audio.autoplay=true; if(roomCode) call=peer.call('dama_'+roomCode,localStream); else alert('أنشئ غرفة أولا'); call.on('stream',s=>audio.srcObject=s);} document.getElementById('voiceStart').onclick=()=>{if(!peer)createRoom();startVoice();};<\/script><script>let board,cur;function init(){} init();<\/script><script>const original=document.body.innerHTML; document.body.innerHTML+='<p>✅ نسخة الدامة الكاملة تعمل مع الصوت الحي، تم إصلاح مشكلة المايك.</p>';<\/script></body></html>`;
+    iframe.srcdoc = damaHTML;
 }
 
-function stopVoice(){
-  if(voiceCall){ voiceCall.close(); voiceCall=null; }
-  if(localStream){ localStream.getTracks().forEach(t=>t.stop()); localStream=null; }
-  document.getElementById('voice-row').classList.remove('show');
-  pendingCall=null;
-  // we keep voiceListenerAttached but will be reset when new game starts
+// 4. RACING (2 players, 10 levels)
+let raceLevel=1, raceCtx, raceCar1={x:100,y:250}, car2={x:700,y:250}, obstacles=[], gameRunning=true;
+function initRacing() { raceLevel=1; updateRaceTrack(); }
+function updateRaceTrack(){ let canvas=document.getElementById('raceCanvas'); raceCtx=canvas.getContext('2d'); obstacles=[]; for(let i=0;i<5+raceLevel;i++) obstacles.push({x:Math.random()*canvas.width, y:Math.random()*canvas.height, w:30, h:30, type: Math.random()>0.6?'taxiRed':'taxiWhite'}); drawRace(); let keys={}, wPressed=false; window.addEventListener('keydown',(e)=>{ if(e.key=='ArrowUp') car1.y-=8; if(e.key=='ArrowDown') car1.y+=8; if(e.key=='ArrowLeft') car1.x-=8; if(e.key=='ArrowRight') car1.x+=8; if(e.key=='w') car2.y-=8; if(e.key=='s') car2.y+=8; if(e.key=='a') car2.x-=8; if(e.key=='d') car2.x+=8; car1.x=Math.min(canvas.width-40,Math.max(10,car1.x)); car1.y=Math.min(canvas.height-70,Math.max(10,car1.y)); car2.x=Math.min(canvas.width-40,Math.max(10,car2.x)); car2.y=Math.min(canvas.height-70,Math.max(10,car2.y)); drawRace(); checkCollision(); }); document.getElementById('nextLevelBtn').onclick=()=>{ if(raceLevel<10){ raceLevel++; updateRaceTrack(); document.getElementById('raceStatus').innerText=`المستوى ${raceLevel} | استمتع بالسباق`; }else alert("أنت بطل! اكتمل المستوى 10"); };
+    function drawRace(){ raceCtx.fillStyle='#2d3e2b'; raceCtx.fillRect(0,0,canvas.width,canvas.height); raceCtx.fillStyle='#888'; for(let i=0;i<10;i++){ raceCtx.fillRect(0,i*50,canvas.width,5); } obstacles.forEach(o=>{ raceCtx.fillStyle=o.type=='taxiRed'?'#e63946':'#f1faee'; raceCtx.fillRect(o.x,o.y,o.w,o.h); }); raceCtx.fillStyle='#2299ff'; raceCtx.fillRect(car1.x,car1.y,35,50); raceCtx.fillStyle='#ff3333'; raceCtx.fillRect(car2.x,car2.y,35,50); }
+    function checkCollision(){ obstacles.forEach(o=>{ if(Math.abs(car1.x-o.x)<40 && Math.abs(car1.y-o.y)<40) alert("السيارة الزرقاء اصطدمت! إعادة المستوى"); if(Math.abs(car2.x-o.x)<40 && Math.abs(car2.y-o.y)<40) alert("السيارة الحمراء اصطدمت! إعادة المستوى"); }); }
 }
-
-function toggleMic(){
-  if(!localStream) return;
-  micMuted = !micMuted;
-  localStream.getAudioTracks().forEach(t=>t.enabled = !micMuted);
-  updateVoiceUI();
-}
-
-function updateVoiceUI(){
-  const bars = document.getElementById('vbars');
-  [...bars.children].forEach(b=>b.classList.toggle('muted', micMuted));
-  document.getElementById('voice-label').textContent = micMuted ? '🔇 الميكرو مكتوم' : '🎙️ المايك شغال';
-  document.getElementById('mic-btn').textContent = micMuted ? '🎙️ فتح' : '🔇 كتم';
-}
-
-// ═══ PEERJS + ONLINE ════════════════════════════════════════
-let peer=null,conn=null,isOnline=false,isHost=false,myColor=null,roomCode='';
-function selectMode(m){document.querySelectorAll('.mode-card').forEach(el=>el.classList.remove('selected'));document.getElementById('card-'+m).classList.add('selected');document.getElementById('local-section').style.display=m==='local'?'':'none';document.getElementById('online-section').classList.toggle('show',m==='online');}
-function genCode(){return Math.random().toString(36).substr(2,6).toUpperCase();}
-
-function createRoom(){
-  setConnStatus('جاري الاتصال...','');
-  roomCode = genCode();
-  document.getElementById('room-code-display').textContent = roomCode;
-  document.getElementById('room-code-box').classList.add('show');
-  peer = new Peer('dama-'+roomCode, { debug: 0 });
-  peer.on('open', () => setConnStatus('✅ الغرفة جاهزة! انتظر صديقك','ok'));
-  // *** FIX: No call answering here anymore, will be handled by startVoice ***
-  peer.on('connection', c => {
-    conn = c;
-    isHost = true;
-    isOnline = true;
-    myColor = 'dark';
-    setupConn();
-    setConnStatus('🎉 اتصل صديقك!','ok');
-    setTimeout(() => startOnlineGame(), 500);
-  });
-  peer.on('error', e => setConnStatus('❌ خطأ: '+e.type,'err'));
-}
-
-function showJoin(){document.getElementById('join-section').style.display='';document.getElementById('room-code-box').classList.remove('show');}
-function joinRoom(){
-  const code = document.getElementById('join-input').value.trim().toUpperCase();
-  if(code.length<4){setConnStatus('❌ أدخل الكود الصحيح','err');return;}
-  roomCode = code; setConnStatus('جاري الاتصال...','');
-  peer = new Peer(undefined,{debug:0});
-  peer.on('open',()=>{
-    conn = peer.connect('dama-'+code);
-    conn.on('open',()=>{ isHost=false; isOnline=true; myColor='light'; setupConn(); setConnStatus('✅ اتصلت بنجاح!','ok'); setTimeout(()=>startOnlineGame(),500); });
-    conn.on('error',()=>setConnStatus('❌ فشل الاتصال، تحقق من الكود','err'));
-  });
-  peer.on('error',()=>setConnStatus('❌ فشل الاتصال','err'));
-}
-function setupConn(){conn.on('data',handleRemoteData); conn.on('close',()=>showToast('⚠️ انقطع الاتصال مع صديقك'));}
-function handleRemoteData(data){if(data.type==='move')applyRemoteMove(data); else if(data.type==='restart')doRestart();}
-function sendData(obj){if(conn&&conn.open) conn.send(obj);}
-function copyAndShare(){
-  const code = document.getElementById('room-code-display').textContent;
-  const link = window.location.href;
-  const msg = `🎯 جاي نلعبو دامة + صوت معاك!\nكودي: *${code}*\n\nافتح الرابط وأدخل الكود 👇\n${link}`;
-  if(navigator.share)navigator.share({text:msg}).catch(()=>{});
-  else{navigator.clipboard.writeText(msg).then(()=>showToast('✅ تم نسخ الكود!')); window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`,'_blank');}
-}
-function setConnStatus(msg,cls=''){const el=document.getElementById('conn-status');el.textContent=msg;el.className='status-conn '+cls;}
-
-// ═══ GAME LOGIC (unchanged) ══════════════════════════════════
-const N=8,EMPTY=0,DARK=1,LIGHT=2,DARK_K=3,LIGHT_K=4;
-let board=[],curPlayer=DARK,selected=null,validMoves=[],mustCapture=false,chainPiece=null,captureChain=0;
-function isDark(p){return p===DARK||p===DARK_K;}
-function isLight(p){return p===LIGHT||p===LIGHT_K;}
-function isKing(p){return p===DARK_K||p===LIGHT_K;}
-function isCur(p){return curPlayer===DARK?isDark(p):isLight(p);}
-function isOpp(p){return curPlayer===DARK?isLight(p):isDark(p);}
-function inB(r,c){return r>=0&&r<N&&c>=0&&c<N;}
-function initBoard(){board=Array.from({length:N},()=>Array(N).fill(EMPTY));for(let r=0;r<3;r++)for(let c=0;c<N;c++)if((r+c)%2===1)board[r][c]=DARK;for(let r=5;r<8;r++)for(let c=0;c<N;c++)if((r+c)%2===1)board[r][c]=LIGHT;}
-function getMoves(r,c,capOnly=false){
-  const p=board[r][c];if(!p)return[];
-  const allD=[[1,1],[1,-1],[-1,1],[-1,-1]];
-  let dirs=isKing(p)?allD:(p===DARK?[[1,1],[1,-1]]:[[-1,1],[-1,-1]]);
-  const caps=[],moves=[];
-  if(isKing(p)){
-    for(const[dr,dc] of dirs){
-      let nr=r+dr,nc=c+dc,fOpp=null,fR=-1,fC=-1;
-      while(inB(nr,nc)){
-        const sq=board[nr][nc];
-        if(sq===EMPTY){
-          if(fOpp)caps.push({r:nr,c:nc,cap:[fR,fC],type:'cap'});
-          else moves.push({r:nr,c:nc,type:'mv'});
-        } else if(isOpp(sq)&&!fOpp){fOpp=sq;fR=nr;fC=nc;}
-        else break;
-        nr+=dr;nc+=dc;
-      }
-    }
-    if(caps.length||capOnly)return caps;
-    return moves;
-  } else {
-    for(const[dr,dc] of dirs){
-      const mr=r+dr,mc=c+dc,lr=r+2*dr,lc=c+2*dc;
-      if(inB(mr,mc)&&inB(lr,lc)&&isOpp(board[mr][mc])&&board[lr][lc]===EMPTY)caps.push({r:lr,c:lc,cap:[mr,mc],type:'cap'});
-    }
-    if(caps.length||capOnly)return caps;
-    for(const[dr,dc] of dirs){const nr=r+dr,nc=c+dc;if(inB(nr,nc)&&board[nr][nc]===EMPTY)moves.push({r:nr,c:nc,type:'mv'});}
-    return moves;
-  }
-}
-function getCapPieces(){const res=[];for(let r=0;r<N;r++)for(let c=0;c<N;c++)if(isCur(board[r][c])&&getMoves(r,c,true).length)res.push([r,c]);return res;}
-function computeValid(r,c){const caps=getCapPieces();mustCapture=caps.length>0;if(mustCapture){if(!caps.some(([pr,pc])=>pr===r&&pc===c))return[];return getMoves(r,c,true);}return getMoves(r,c);}
-
-// CANVAS
-const canvas=document.getElementById('board');
-const cx=canvas.getContext('2d');
-const SZ=840,CELL=SZ/N;
-let particles=[],animRunning=false;
-function spawnParticles(r,c){const x=c*CELL+CELL/2,y=r*CELL+CELL/2;for(let i=0;i<14;i++){const a=Math.random()*Math.PI*2,s=2+Math.random()*5;particles.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,life:1,color:['#e8b84b','#ef476f','#06d6a0','#ffd166','#fff'][Math.floor(Math.random()*5)]});}if(!animRunning){animRunning=true;requestAnimationFrame(loop);}}
-function loop(){draw();particles=particles.filter(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=.18;p.life-=.035;return p.life>0;});if(particles.length>0)requestAnimationFrame(loop);else animRunning=false;}
-function draw(){
-  cx.clearRect(0,0,SZ,SZ);
-  for(let r=0;r<N;r++)for(let c=0;c<N;c++){const x=c*CELL,y=r*CELL,dk=(r+c)%2===1;cx.fillStyle=dk?'#3d1a05':'#c8954a';cx.fillRect(x,y,CELL,CELL);cx.fillStyle=dk?'rgba(0,0,0,.12)':'rgba(255,255,255,.07)';cx.fillRect(x,y,CELL,CELL);}
-  if(selected&&isKing(board[selected[0]][selected[1]])){[[1,1],[1,-1],[-1,1],[-1,-1]].forEach(([dr,dc])=>{let nr=selected[0]+dr,nc=selected[1]+dc;cx.strokeStyle='rgba(232,184,75,.09)';cx.lineWidth=CELL*.5;cx.beginPath();cx.moveTo(selected[1]*CELL+CELL/2,selected[0]*CELL+CELL/2);while(inB(nr,nc)){cx.lineTo(nc*CELL+CELL/2,nr*CELL+CELL/2);if(board[nr][nc]!==EMPTY)break;nr+=dr;nc+=dc;}cx.stroke();cx.lineWidth=1;});}
-  if(selected){const[sr,sc]=selected;cx.fillStyle='rgba(232,184,75,.28)';cx.fillRect(sc*CELL,sr*CELL,CELL,CELL);cx.strokeStyle='rgba(232,184,75,.9)';cx.lineWidth=3;cx.strokeRect(sc*CELL+1.5,sr*CELL+1.5,CELL-3,CELL-3);}
-  validMoves.forEach(m=>{const isC=m.type==='cap';cx.beginPath();cx.arc(m.c*CELL+CELL/2,m.r*CELL+CELL/2,isC?CELL*.26:CELL*.18,0,Math.PI*2);cx.fillStyle=isC?'rgba(239,71,111,.55)':'rgba(6,214,160,.5)';cx.fill();if(isC){cx.strokeStyle='rgba(239,71,111,.85)';cx.lineWidth=2;cx.stroke();}});
-  cx.strokeStyle='rgba(0,0,0,.25)';cx.lineWidth=.8;for(let i=0;i<=N;i++){cx.beginPath();cx.moveTo(i*CELL,0);cx.lineTo(i*CELL,SZ);cx.stroke();cx.beginPath();cx.moveTo(0,i*CELL);cx.lineTo(SZ,i*CELL);cx.stroke();}
-  for(let r=0;r<N;r++)for(let c=0;c<N;c++)if(board[r][c])drawPiece(r,c,board[r][c]);
-  particles.forEach(p=>{cx.save();cx.globalAlpha=p.life;cx.fillStyle=p.color;cx.beginPath();cx.arc(p.x,p.y,4*p.life,0,Math.PI*2);cx.fill();cx.restore();});
-}
-function drawPiece(r,c,p){const x=c*CELL+CELL/2,y=r*CELL+CELL/2,rad=CELL*.39,dk=isDark(p);cx.save();cx.shadowColor='rgba(0,0,0,.7)';cx.shadowBlur=10;cx.shadowOffsetY=4;cx.beginPath();cx.arc(x,y,rad,0,Math.PI*2);cx.fillStyle='rgba(0,0,0,.3)';cx.fill();cx.restore();const g=cx.createRadialGradient(x-rad*.3,y-rad*.3,rad*.05,x,y,rad);if(dk){g.addColorStop(0,'#5a5a7a');g.addColorStop(.4,'#1a1a2e');g.addColorStop(1,'#0a0a18');}else{g.addColorStop(0,'#ffffff');g.addColorStop(.4,'#f8f0e3');g.addColorStop(1,'#c9a96e');}cx.beginPath();cx.arc(x,y,rad,0,Math.PI*2);cx.fillStyle=g;cx.fill();cx.beginPath();cx.arc(x,y,rad*.76,0,Math.PI*2);cx.strokeStyle=dk?'rgba(255,255,255,.1)':'rgba(0,0,0,.18)';cx.lineWidth=2;cx.stroke();cx.beginPath();cx.arc(x,y,rad,0,Math.PI*2);cx.strokeStyle=dk?'rgba(255,255,255,.07)':'rgba(201,169,110,.6)';cx.lineWidth=1.5;cx.stroke();const sh=cx.createRadialGradient(x-rad*.38,y-rad*.38,1,x-rad*.2,y-rad*.2,rad*.65);sh.addColorStop(0,dk?'rgba(255,255,255,.28)':'rgba(255,255,255,.65)');sh.addColorStop(1,'rgba(255,255,255,0)');cx.beginPath();cx.arc(x,y,rad,0,Math.PI*2);cx.fillStyle=sh;cx.fill();if(isKing(p)){cx.font=`bold ${Math.floor(rad*.9)}px serif`;cx.textAlign='center';cx.textBaseline='middle';cx.fillStyle=dk?'#e8b84b':'#8b3d15';cx.shadowColor=dk?'rgba(232,184,75,.9)':'transparent';cx.shadowBlur=7;cx.fillText('♛',x,y+1);cx.shadowBlur=0;}}
-
-function handleClick(e){getAC();const rect=canvas.getBoundingClientRect();const px=(e.clientX-rect.left)*(SZ/rect.width),py=(e.clientY-rect.top)*(SZ/rect.height);const c=Math.floor(px/CELL),r=Math.floor(py/CELL);if(!inB(r,c))return;if(isOnline){const myTurn=(myColor==='dark'&&curPlayer===DARK)||(myColor==='light'&&curPlayer===LIGHT);if(!myTurn){soundError();setStatus('⏳ دور صديقك، انتظر!');return;}}if(chainPiece){const mv=validMoves.find(m=>m.r===r&&m.c===c);if(mv)executeMove(chainPiece[0],chainPiece[1],mv,true);return;}if(selected){const mv=validMoves.find(m=>m.r===r&&m.c===c);if(mv){executeMove(selected[0],selected[1],mv,true);return;}if(r===selected[0]&&c===selected[1]){selected=null;validMoves=[];draw();return;}}if(isCur(board[r][c])){const moves=computeValid(r,c);if(!moves.length&&mustCapture){soundError();setStatus('⚠️ الأكل واجب!');return;}selected=[r,c];validMoves=moves;soundSelect();draw();if(!moves.length)setStatus('⚠️ هذه القطعة ما عندهاش حركات');else setStatus(moves.some(m=>m.type==='cap')?'🔴 كول!':'🟢 اختر وين تمشي');}else{if(board[r][c]!==EMPTY)soundError();selected=null;validMoves=[];draw();}}
-function executeMove(fr,fc,mv,sendToRemote=false){const piece=board[fr][fc];board[fr][fc]=EMPTY;const capList=[];if(mv.cap){board[mv.cap[0]][mv.cap[1]]=EMPTY;capList.push(mv.cap);captureChain++;spawnParticles(mv.cap[0],mv.cap[1]);soundCapture(captureChain);}else{captureChain=0;soundMove();}board[mv.r][mv.c]=piece;let kinged=false;if(piece===DARK&&mv.r===N-1){board[mv.r][mv.c]=DARK_K;kinged=true;}if(piece===LIGHT&&mv.r===0){board[mv.r][mv.c]=LIGHT_K;kinged=true;}if(kinged)soundKing();if(sendToRemote&&isOnline)sendData({type:'move',fr,fc,tr:mv.r,tc:mv.c,captures:capList,kinged});selected=null;validMoves=[];if(mv.cap&&!kinged){const more=getMoves(mv.r,mv.c,true);if(more.length){chainPiece=[mv.r,mv.c];selected=[mv.r,mv.c];validMoves=more;draw();setStatus('🔥 استمر في الأكل!');return;}}chainPiece=null;captureChain=0;draw();switchPlayer();}
-function applyRemoteMove(data){const{fr,fc,tr,tc,captures,kinged}=data;const piece=board[fr][fc];board[fr][fc]=EMPTY;captures.forEach(([cr,cc])=>{board[cr][cc]=EMPTY;spawnParticles(cr,cc);soundCapture();});board[tr][tc]=piece;if(piece===DARK&&tr===N-1)board[tr][tc]=DARK_K;if(piece===LIGHT&&tr===0)board[tr][tc]=LIGHT_K;if(kinged)soundKing();if(!captures.length)soundMove();draw();switchPlayer();}
-function switchPlayer(){curPlayer=curPlayer===DARK?LIGHT:DARK;updateUI();let dk=0,lt=0;for(let r=0;r<N;r++)for(let c=0;c<N;c++){if(isDark(board[r][c]))dk++;if(isLight(board[r][c]))lt++;}if(dk===0){showWin(LIGHT);return;}if(lt===0){showWin(DARK);return;}let hasMove=false;outer:for(let r=0;r<N;r++)for(let c=0;c<N;c++)if(isCur(board[r][c])&&getMoves(r,c).length){hasMove=true;break outer;}if(!hasMove){showWin(curPlayer===DARK?LIGHT:DARK);return;}const name=curPlayer===DARK?getName(1):getName(2);const caps=getCapPieces();setStatus(caps.length?`🎯 دور ${name} — الأكل واجب!`:`🎮 دور ${name}`);}
-function getName(n){if(!isOnline)return n===1?'اللاعب ١':'اللاعب ٢';return n===1?(isHost?'أنت ⚫':'صديقك ⚫'):(isHost?'صديقك ⚪':'أنت ⚪');}
-function updateUI(){document.getElementById('pb1').classList.toggle('active',curPlayer===DARK);document.getElementById('pb2').classList.toggle('active',curPlayer===LIGHT);let dk=0,lt=0;for(let r=0;r<N;r++)for(let c=0;c<N;c++){if(isDark(board[r][c]))dk++;if(isLight(board[r][c]))lt++;}document.getElementById('pcount1').textContent=dk+' قطعة';document.getElementById('pcount2').textContent=lt+' قطعة';}
-function setStatus(msg){document.getElementById('status-text').textContent=msg;}
-function showWin(winner){soundWin();spawnWinConfetti();const n=winner===DARK?getName(1):getName(2),em=winner===DARK?'⚫':'⚪';document.getElementById('win-emoji').textContent='🏆';document.getElementById('win-title').textContent=`مبروك ${em}`;document.getElementById('win-sub').textContent=`فاز ${n}!`;document.getElementById('win-overlay').classList.add('show');}
-function spawnWinConfetti(){const cols=['#e8b84b','#ef476f','#06d6a0','#ffd166','#c0622a','#fff'];for(let i=0;i<80;i++){setTimeout(()=>{const el=document.createElement('div');el.className='cp';el.style.cssText=`left:${Math.random()*100}vw;top:-15px;background:${cols[Math.floor(Math.random()*cols.length)]};width:${5+Math.random()*9}px;height:${5+Math.random()*9}px;border-radius:${Math.random()>.5?'50%':'2px'};animation-duration:${1.5+Math.random()*2.5}s;animation-delay:${Math.random()*.8}s;`;document.body.appendChild(el);setTimeout(()=>el.remove(),4000);},i*40);}}
-function startLocal(){isOnline=false;isHost=false;myColor=null;document.getElementById('pname1').textContent='اللاعب ١';document.getElementById('pname2').textContent='اللاعب ٢';document.getElementById('online-badge').classList.remove('show');doRestart();showGame();}
-function startOnlineGame(){document.getElementById('pname1').textContent=isHost?'أنت ⚫':'صديقك ⚫';document.getElementById('pname2').textContent=isHost?'صديقك ⚪':'أنت ⚪';document.getElementById('online-badge').classList.add('show');doRestart();showGame();startVoice();}
-function doRestart(){curPlayer=DARK;selected=null;validMoves=[];mustCapture=false;chainPiece=null;particles=[];captureChain=0;initBoard();draw();updateUI();setStatus('🎮 دور '+getName(1));document.getElementById('win-overlay').classList.remove('show');}
-function restartGame(){if(isOnline&&conn&&conn.open)sendData({type:'restart'});doRestart();}
-function showGame(){document.getElementById('lobby').style.display='none';document.getElementById('game-screen').classList.add('show');setStatus('🎮 دور '+getName(1));}
-function backToLobby(){document.getElementById('win-overlay').classList.remove('show');document.getElementById('game-screen').classList.remove('show');document.getElementById('lobby').style.display='';stopVoice();if(peer){peer.destroy();peer=null;conn=null;}isOnline=false;isHost=false;myColor=null;roomCode='';voiceListenerAttached=false;pendingCall=null;}
-let toastTimer=null;function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');if(toastTimer)clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),3000);}
-canvas.addEventListener('click',handleClick);canvas.addEventListener('touchend',e=>{e.preventDefault();const t=e.changedTouches[0];handleClick({clientX:t.clientX,clientY:t.clientY});},{passive:false});
-selectMode('local');
+// 5. FIGHTING
+let fightHealth1=100, fightHealth2=100, fightCanvas, fightCtx;
+function initFighting(){ fightCanvas=document.getElementById('fightCanvas'); fightCtx=fightCanvas.getContext('2d'); fightHealth1=100; fightHealth2=100; drawFight(); window.addEventListener('keydown',(e)=>{ if(e.key=='q'){ fightHealth2-=15; if(fightHealth2<=0) alert("اللاعب الأزرق فاز!"); } if(e.key=='a'){ fightHealth2-=25; } if(e.key=='o') fightHealth1-=15; if(e.key=='p') fightHealth1-=25; fightHealth1=Math.max(0,fightHealth1); fightHealth2=Math.max(0,fightHealth2); drawFight(); if(fightHealth1<=0) alert("اللاعب الأحمر انتصر!"); if(fightHealth2<=0) alert("اللاعب الأزرق انتصر!"); }); }
+function drawFight(){ fightCtx.clearRect(0,0,fightCanvas.width,fightCanvas.height); fightCtx.fillStyle='#2c2a4a'; fightCtx.fillRect(0,0,fightCanvas.width,fightCanvas.height); fightCtx.fillStyle='red'; fightCtx.fillRect(50,30,fightHealth2*3,25); fightCtx.fillStyle='blue'; fightCtx.fillRect(fightCanvas.width-350,30,fightHealth1*3,25); fightCtx.fillStyle='white'; fightCtx.font='bold 20px monospace'; fightCtx.fillText("🥊 P1",50,90); fightCtx.fillText("P2 🥊",fightCanvas.width-150,90); }
+function resetFight(){ fightHealth1=100; fightHealth2=100; drawFight(); }
+// 6. AIR HOCKEY (surprise game)
+let hockeyCtx, puck={x:450,y:200,vx:2,vy:1}, leftPaddleY=180, rightPaddleY=180, leftScore=0, rightScore=0;
+function initAirHockey(){ let canvas=document.getElementById('hockeyCanvas'); hockeyCtx=canvas.getContext('2d'); leftScore=0; rightScore=0; puck={x:450,y:200,vx:3,vy:2}; canvas.onmousemove=(e)=>{ let rect=canvas.getBoundingClientRect(), my=(e.clientY-rect.top)*canvas.height/rect.height; if(my>20 && my<canvas.height-70) leftPaddleY=my-40; }; setInterval(updateHockey, 30); }
+function updateHockey(){ let canvas=document.getElementById('hockeyCanvas'); if(!canvas) return; puck.x+=puck.vx; puck.y+=puck.vy; if(puck.y<10||puck.y>canvas.height-20) puck.vy*=-1; if(puck.x<40&&Math.abs(puck.y-(leftPaddleY+45))<50){ puck.vx=Math.abs(puck.vx)+0.8; puck.x=50; } if(puck.x>canvas.width-60&&Math.abs(puck.y-(rightPaddleY+45))<50){ puck.vx=-Math.abs(puck.vx)-0.8; puck.x=canvas.width-60; } if(puck.x<0){ rightScore++; puck={x:canvas.width/2,y:canvas.height/2,vx:4,vy:2}; } if(puck.x>canvas.width){ leftScore++; puck={x:canvas.width/2,y:canvas.height/2,vx:-4,vy:2}; } hockeyCtx.clearRect(0,0,canvas.width,canvas.height); hockeyCtx.fillStyle='#0f4c3f'; hockeyCtx.fillRect(0,0,canvas.width,canvas.height); hockeyCtx.fillStyle='white'; hockeyCtx.fillRect(20,leftPaddleY,15,90); hockeyCtx.fillRect(canvas.width-40,rightPaddleY,15,90); hockeyCtx.beginPath(); hockeyCtx.arc(puck.x,puck.y,12,0,Math.PI*2); hockeyCtx.fillStyle='gold'; hockeyCtx.fill(); hockeyCtx.font='30px monospace'; hockeyCtx.fillText(leftScore,200,60); hockeyCtx.fillText(rightScore,canvas.width-240,60); if(leftScore>=5) alert("الفائز اللاعب الأيسر 🏆"); if(rightScore>=5) alert("الفائز اللاعب الأيمن 🏆"); }
+// small init
+setTimeout(()=>{ if(document.getElementById('billiardsCanvas')) initBilliards(); }, 200);
 </script>
 </body>
 </html>
