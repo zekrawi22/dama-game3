@@ -1,434 +1,453 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>🎮 Family Game Hub | 6 ألعاب عائلية مع صوت حي</title>
-    <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', 'Tajawal', system-ui, -apple-system, sans-serif;
-        }
-
-        body {
-            background: radial-gradient(circle at 10% 20%, #0a0f2a, #03050b);
-            min-height: 100vh;
-            padding: 20px;
-        }
-
-        /* main hub */
-        .hub-container {
-            max-width: 1400px;
-            margin: 0 auto;
-            backdrop-filter: blur(2px);
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .header h1 {
-            font-size: 3rem;
-            background: linear-gradient(135deg, #FFE6B0, #F5B041);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
-        }
-
-        .header p {
-            color: #ffd966aa;
-            letter-spacing: 2px;
-            font-size: 1rem;
-        }
-
-        /* games grid */
-        .games-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 25px;
-            margin: 20px 0;
-        }
-
-        .game-card {
-            background: rgba(18, 25, 45, 0.75);
-            backdrop-filter: blur(12px);
-            border-radius: 32px;
-            border: 1px solid rgba(245, 176, 65, 0.4);
-            overflow: hidden;
-            transition: transform 0.3s, box-shadow 0.3s;
-            cursor: pointer;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
-        }
-
-        .game-card:hover {
-            transform: translateY(-8px);
-            border-color: #F5B041;
-            box-shadow: 0 20px 40px rgba(245,176,65,0.2);
-        }
-
-        .game-preview {
-            height: 170px;
-            background-size: cover;
-            background-position: center;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 4rem;
-            background-blend-mode: overlay;
-        }
-
-        .game-info {
-            padding: 20px;
-            text-align: center;
-        }
-
-        .game-info h3 {
-            font-size: 1.8rem;
-            color: #FFD966;
-            margin-bottom: 5px;
-        }
-
-        .game-info p {
-            color: #b9c7d9;
-            font-size: 0.85rem;
-        }
-
-        /* game room overlay (modal style) */
-        .game-room {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: #0a0c18ea;
-            backdrop-filter: blur(10px);
-            z-index: 1000;
-            padding: 20px;
-            overflow-y: auto;
-            flex-direction: column;
-        }
-
-        .game-room.active {
-            display: flex;
-        }
-
-        .room-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 15px;
-            background: #11161fcc;
-            padding: 15px 25px;
-            border-radius: 60px;
-            margin-bottom: 30px;
-            border: 1px solid #f5b04155;
-        }
-
-        .back-home {
-            background: #F5B041;
-            border: none;
-            padding: 8px 24px;
-            border-radius: 40px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-
-        .game-title {
-            font-size: 2rem;
-            color: #FFE6B0;
-        }
-
-        .online-zone {
-            display: flex;
-            gap: 12px;
-            background: #1e2a3a;
-            padding: 8px 18px;
-            border-radius: 50px;
-        }
-
-        .online-zone input {
-            background: #0f172a;
-            border: 1px solid #facc15;
-            padding: 6px 12px;
-            border-radius: 40px;
-            color: #facc15;
-            width: 110px;
-            text-align: center;
-        }
-
-        .btn-gold {
-            background: #facc15;
-            border: none;
-            padding: 6px 16px;
-            border-radius: 40px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        .btn-outline-gold {
-            background: transparent;
-            border: 1px solid #facc15;
-            color: #facc15;
-            padding: 6px 16px;
-            border-radius: 40px;
-            cursor: pointer;
-        }
-
-        .vs-ai {
-            background: #4f46e5;
-            border: none;
-            padding: 8px 20px;
-            border-radius: 40px;
-            color: white;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        .game-canvas-container {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 20px;
-        }
-
-        canvas {
-            border-radius: 28px;
-            box-shadow: 0 20px 35px black;
-            background: #1e2a2e;
-            max-width: 100%;
-            height: auto;
-        }
-
-        .game-status {
-            text-align: center;
-            color: #facc15;
-            font-size: 1.2rem;
-            margin: 15px 0;
-        }
-
-        .voice-badge {
-            background: #2c3e50;
-            padding: 6px 15px;
-            border-radius: 30px;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Manta Casa — Lavage de mantas à domicile</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .glass { backdrop-filter: blur(12px); }
+  </style>
 </head>
-<body>
-<div class="hub-container" id="mainHub">
-    <div class="header">
-        <h1>🎲 العاب العائلة | FAMILY GAMES</h1>
-        <p>🎙️ تحدث مع أصدقائك عبر الصوت الحي أثناء اللعب | 6 ألعاب احترافية</p>
-    </div>
-    <div class="games-grid" id="gamesGrid">
-        <div class="game-card" data-game="dama"><div class="game-preview">👑</div><div class="game-info"><h3>دامة مغربية</h3><p>كلاسيكية + ملك + صوت</p></div></div>
-        <div class="game-card" data-game="karta"><div class="game-preview">🎴</div><div class="game-info"><h3>كارطة مراكش</h3><p>لعبة الجبن الزرواط</p></div></div>
-        <div class="game-card" data-game="billiard"><div class="game-preview">🎱</div><div class="game-info"><h3>بلياردو محترف</h3><p>جيب الكرات، فيزياء واقعية</p></div></div>
-        <div class="game-card" data-game="tictac"><div class="game-preview">❌⭕</div><div class="game-info"><h3>إكس - أو</h3><p>تصميم فاخر</p></div></div>
-        <div class="game-card" data-game="racing"><div class="game-preview">🏁</div><div class="game-info"><h3>سباق المدينة</h3><p>10 مستويات، سيارات حمراء، زرقاء</p></div></div>
-        <div class="game-card" data-game="fighting"><div class="game-preview">🥊</div><div class="game-info"><h3>قتال الشوارع</h3><p>أزرار بلاي ستيشن : △ □ ○ X</p></div></div>
-    </div>
+<body class="bg-slate-50 text-slate-900"><header class="sticky top-0 z-50 border-b border-slate-200 bg-white/90 glass">
+  <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <div class="w-12 h-12 rounded-2xl bg-blue-600 text-white flex items-center justify-center text-xl font-black">M</div>
+      <div>
+        <h1 class="font-black text-xl">Manta Casa</h1>
+        <p class="text-xs text-slate-500">Casablanca only</p>
+      </div>
+    </div><div class="hidden md:flex gap-3">
+  <a href="#commande" class="font-bold hover:text-blue-600">Commander</a>
+  <a href="#tracking" class="font-bold hover:text-blue-600">Suivi</a>
+  <a href="#pricing" class="font-bold hover:text-blue-600">Tarifs</a>
+  <a href="#admin" class="font-bold hover:text-blue-600">Admin</a>
 </div>
 
-<!-- لكل لعبة room ديناميكي يتم إنشاؤها -->
-<div id="game-dynamic-room" class="game-room"></div>
+  </div>
+</header><section class="relative overflow-hidden bg-gradient-to-br from-blue-50 via-white to-amber-50">
+  <div class="max-w-7xl mx-auto px-4 py-20 grid lg:grid-cols-2 gap-12 items-center"><div>
+  <div class="inline-flex items-center gap-2 bg-white border border-blue-100 rounded-full px-4 py-2 text-sm font-bold text-blue-700 shadow-sm">
+    📍 Service à Casablanca
+  </div>
 
-<script>
-    // --------------------------------------------- UTILS & VOICE (global peer handling per game)
-    let activePeer = null, activeConn = null, activeStream = null, activeCall = null;
-    let currentGameId = null;
-    let voiceEnabled = false;
+  <h1 class="mt-6 text-5xl font-black leading-tight">
+    Lavage de mantas à domicile à Casablanca
+  </h1>
 
-    async function requestMic() {
-        if(activeStream) return activeStream;
-        try {
-            activeStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-            return activeStream;
-        } catch(e) { console.warn("mic error",e); return null; }
+  <p class="mt-6 text-lg text-slate-600 leading-8 max-w-xl">
+    On récupère vos mantas chez vous, on les lave, on les sèche, puis on vous les livre propres et emballées.
+  </p>
+
+  <div class="mt-8 flex flex-col sm:flex-row gap-4">
+    <a href="#commande" class="bg-blue-600 hover:bg-blue-700 transition text-white font-black px-7 py-4 rounded-2xl shadow-xl shadow-blue-600/20 text-center">
+      Commander maintenant
+    </a>
+
+    <a href="#tracking" class="bg-white border border-slate-200 hover:border-blue-200 hover:bg-blue-50 transition font-black px-7 py-4 rounded-2xl text-center">
+      Suivre ma commande
+    </a>
+  </div>
+</div>
+
+<div class="bg-white rounded-[2rem] p-6 shadow-2xl shadow-blue-900/10 border border-white">
+  <div class="bg-gradient-to-br from-blue-600 to-blue-900 rounded-[1.5rem] p-6 text-white">
+    <div class="flex items-center justify-between">
+      <div>
+        <p class="text-blue-100 font-semibold">Commande active</p>
+        <h2 class="text-2xl font-black mt-1">MANTA-CASA-2026-0001</h2>
+      </div>
+      <div class="bg-white/10 rounded-2xl p-4 text-3xl">🧺</div>
+    </div>
+
+    <div class="mt-8 space-y-4">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-full bg-white text-blue-700 flex items-center justify-center font-black">✓</div>
+        <div class="flex-1">
+          <p class="font-bold">Commande reçue</p>
+          <div class="h-2 rounded-full bg-white/20 mt-1">
+            <div class="h-2 rounded-full bg-white w-[90%]"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-full bg-white text-blue-700 flex items-center justify-center font-black">✓</div>
+        <div class="flex-1">
+          <p class="font-bold">Confirmation WhatsApp</p>
+          <div class="h-2 rounded-full bg-white/20 mt-1">
+            <div class="h-2 rounded-full bg-white w-[75%]"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center font-black">3</div>
+        <div class="flex-1">
+          <p class="font-bold">Ramassage planifié</p>
+          <div class="h-2 rounded-full bg-white/20 mt-1">
+            <div class="h-2 rounded-full bg-white w-[45%]"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+  </div>
+</section><section class="py-20 bg-white">
+  <div class="max-w-7xl mx-auto px-4">
+    <div class="text-center max-w-3xl mx-auto">
+      <p class="uppercase tracking-widest text-blue-600 font-black text-sm">Comment ça marche</p>
+      <h2 class="mt-3 text-4xl font-black">4 étapes simples</h2>
+    </div><div class="mt-12 grid md:grid-cols-4 gap-6">
+  <div class="bg-slate-50 rounded-3xl p-6">
+    <div class="text-4xl">📝</div>
+    <h3 class="font-black text-xl mt-4">1. Commande</h3>
+    <p class="mt-2 text-slate-600">Vous passez la commande rapidement.</p>
+  </div>
+
+  <div class="bg-slate-50 rounded-3xl p-6">
+    <div class="text-4xl">🚚</div>
+    <h3 class="font-black text-xl mt-4">2. Récupération</h3>
+    <p class="mt-2 text-slate-600">On récupère vos mantas chez vous.</p>
+  </div>
+
+  <div class="bg-slate-50 rounded-3xl p-6">
+    <div class="text-4xl">📸</div>
+    <h3 class="font-black text-xl mt-4">3. Lavage</h3>
+    <p class="mt-2 text-slate-600">Photos avant/après + séchage.</p>
+  </div>
+
+  <div class="bg-slate-50 rounded-3xl p-6">
+    <div class="text-4xl">📦</div>
+    <h3 class="font-black text-xl mt-4">4. Livraison</h3>
+    <p class="mt-2 text-slate-600">Livraison propre jusqu'à chez vous.</p>
+  </div>
+</div>
+
+  </div>
+</section><section id="pricing" class="py-20 bg-slate-50">
+  <div class="max-w-7xl mx-auto px-4">
+    <div class="text-center">
+      <p class="uppercase tracking-widest text-blue-600 font-black text-sm">Tarifs</p>
+      <h2 class="mt-3 text-4xl font-black">Prix simples</h2>
+    </div><div class="grid md:grid-cols-4 gap-6 mt-12">
+  <div class="bg-white rounded-3xl p-6 shadow-sm">
+    <h3 class="font-black text-xl">Petite manta</h3>
+    <div class="text-5xl font-black text-blue-600 mt-6">39<span class="text-xl">DH</span></div>
+  </div>
+
+  <div class="bg-white rounded-3xl p-6 shadow-sm">
+    <h3 class="font-black text-xl">Moyenne manta</h3>
+    <div class="text-5xl font-black text-blue-600 mt-6">49<span class="text-xl">DH</span></div>
+  </div>
+
+  <div class="bg-white rounded-3xl p-6 shadow-sm">
+    <h3 class="font-black text-xl">Grande manta</h3>
+    <div class="text-5xl font-black text-blue-600 mt-6">59<span class="text-xl">DH</span></div>
+  </div>
+
+  <div class="bg-white rounded-3xl p-6 shadow-sm">
+    <h3 class="font-black text-xl">Extra grande</h3>
+    <div class="text-5xl font-black text-blue-600 mt-6">79<span class="text-xl">DH</span></div>
+  </div>
+</div>
+
+  </div>
+</section><section id="commande" class="py-20 bg-white">
+  <div class="max-w-5xl mx-auto px-4"><div class="text-center">
+  <p class="uppercase tracking-widest text-blue-600 font-black text-sm">Commande</p>
+  <h2 class="mt-3 text-4xl font-black">Commander maintenant</h2>
+</div>
+
+<form id="orderForm" class="mt-12 bg-slate-50 rounded-[2rem] p-8 shadow-sm">
+
+  <div class="grid md:grid-cols-2 gap-5">
+
+    <input required id="name" type="text" placeholder="Nom complet" class="rounded-2xl px-5 py-4 border border-slate-200 outline-none focus:ring-4 focus:ring-blue-100">
+
+    <input required id="phone" type="text" placeholder="Téléphone / WhatsApp" class="rounded-2xl px-5 py-4 border border-slate-200 outline-none focus:ring-4 focus:ring-blue-100">
+
+    <input required id="address" type="text" placeholder="Adresse à Casablanca" class="md:col-span-2 rounded-2xl px-5 py-4 border border-slate-200 outline-none focus:ring-4 focus:ring-blue-100">
+
+    <select id="quartier" class="rounded-2xl px-5 py-4 border border-slate-200 outline-none focus:ring-4 focus:ring-blue-100">
+      <option>Ain Sebaa</option>
+      <option>Maarif</option>
+      <option>Anfa</option>
+      <option>Hay Hassani</option>
+      <option>Sidi Maarouf</option>
+      <option>Bernoussi</option>
+    </select>
+
+    <input required id="blankets" type="number" min="1" value="1" class="rounded-2xl px-5 py-4 border border-slate-200 outline-none focus:ring-4 focus:ring-blue-100">
+
+    <select id="size" class="rounded-2xl px-5 py-4 border border-slate-200 outline-none focus:ring-4 focus:ring-blue-100">
+      <option>Petite</option>
+      <option>Moyenne</option>
+      <option>Grande</option>
+      <option>Extra grande</option>
+    </select>
+
+    <input required id="pickupDate" type="date" class="rounded-2xl px-5 py-4 border border-slate-200 outline-none focus:ring-4 focus:ring-blue-100">
+
+    <input required id="pickupTime" type="time" class="rounded-2xl px-5 py-4 border border-slate-200 outline-none focus:ring-4 focus:ring-blue-100">
+
+    <textarea id="notes" placeholder="Notes" class="md:col-span-2 rounded-2xl px-5 py-4 border border-slate-200 outline-none focus:ring-4 focus:ring-blue-100 min-h-[120px]"></textarea>
+  </div>
+
+  <div class="grid md:grid-cols-2 gap-5 mt-6">
+
+    <label class="bg-white rounded-3xl p-6 border border-blue-200 cursor-pointer">
+      <input type="radio" name="payment" value="Cash" checked>
+      <h3 class="font-black text-xl mt-3">💵 Cash on delivery</h3>
+    </label>
+
+    <label class="bg-white rounded-3xl p-6 border border-slate-200 cursor-pointer">
+      <input type="radio" name="payment" value="Online">
+      <h3 class="font-black text-xl mt-3">💳 Paiement en ligne</h3>
+    </label>
+  </div>
+
+  <button class="w-full mt-8 bg-blue-600 hover:bg-blue-700 transition text-white font-black py-5 rounded-2xl text-lg shadow-xl shadow-blue-600/20">
+    Confirmer la commande
+  </button>
+</form>
+
+<div id="confirmation" class="hidden mt-10 bg-green-50 border border-green-200 rounded-[2rem] p-8 text-center">
+  <div class="text-6xl">✅</div>
+  <h3 class="text-3xl font-black mt-4">Commande confirmée</h3>
+  <p class="mt-4 text-slate-600">Votre numéro de suivi :</p>
+  <div id="trackingNumber" class="mt-4 text-2xl font-black bg-white rounded-2xl px-5 py-4 inline-block"></div>
+
+  <a id="whatsappBtn" target="_blank" class="inline-block mt-6 bg-green-600 hover:bg-green-700 transition text-white font-black px-8 py-4 rounded-2xl shadow-xl shadow-green-600/20">
+    Envoyer sur WhatsApp
+  </a>
+</div>
+
+  </div>
+</section><section id="tracking" class="py-20 bg-slate-50">
+  <div class="max-w-5xl mx-auto px-4"><div class="text-center">
+  <p class="uppercase tracking-widest text-blue-600 font-black text-sm">Tracking</p>
+  <h2 class="mt-3 text-4xl font-black">Suivre ma commande</h2>
+</div>
+
+<div class="mt-10 flex gap-3 bg-white p-3 rounded-3xl shadow-sm max-w-2xl mx-auto">
+  <input id="trackingInput" placeholder="MANTA-CASA-2026-0001" class="flex-1 px-5 py-4 rounded-2xl outline-none">
+  <button onclick="trackOrder()" class="bg-blue-600 text-white font-black px-6 rounded-2xl">Rechercher</button>
+</div>
+
+<div id="trackingResult" class="hidden mt-10 bg-white rounded-[2rem] p-8 shadow-sm">
+
+  <div class="flex items-center justify-between flex-wrap gap-4 border-b border-slate-100 pb-6">
+    <div>
+      <p class="text-slate-500 font-semibold">Tracking</p>
+      <h3 id="resultTracking" class="text-2xl font-black"></h3>
+    </div>
+
+    <span id="statusBadge" class="bg-blue-100 text-blue-700 px-5 py-3 rounded-2xl font-black"></span>
+  </div>
+
+  <div class="mt-8 space-y-4">
+    <div class="bg-slate-50 rounded-2xl p-4">✅ Commande reçue</div>
+    <div class="bg-slate-50 rounded-2xl p-4">💬 Confirmation WhatsApp</div>
+    <div class="bg-slate-50 rounded-2xl p-4">🚚 Pickup scheduled</div>
+    <div class="bg-slate-50 rounded-2xl p-4">🧺 Washing</div>
+  </div>
+
+  <div class="grid md:grid-cols-2 gap-6 mt-10">
+
+    <div>
+      <h4 class="font-black text-xl mb-4">Photo avant</h4>
+      <img id="beforePreview" class="rounded-3xl h-64 w-full object-cover bg-slate-100">
+    </div>
+
+    <div>
+      <h4 class="font-black text-xl mb-4">Photo après</h4>
+      <img id="afterPreview" class="rounded-3xl h-64 w-full object-cover bg-slate-100">
+    </div>
+  </div>
+
+</div>
+
+  </div>
+</section><section id="admin" class="py-20 bg-white">
+  <div class="max-w-7xl mx-auto px-4"><div class="flex items-center justify-between flex-wrap gap-4">
+  <div>
+    <p class="uppercase tracking-widest text-blue-600 font-black text-sm">Admin Dashboard</p>
+    <h2 class="mt-3 text-4xl font-black">Gestion des commandes</h2>
+  </div>
+</div>
+
+<div id="ordersContainer" class="grid gap-6 mt-10"></div>
+
+  </div>
+</section><a href="https://wa.me/212600000000" target="_blank" class="fixed bottom-5 right-5 bg-green-600 hover:bg-green-700 transition text-white w-16 h-16 rounded-full flex items-center justify-center text-3xl shadow-2xl shadow-green-600/30 z-50">
+💬
+</a><script>
+
+let orders = JSON.parse(localStorage.getItem('mantaOrders')) || [];
+
+function generateTracking() {
+  return 'MANTA-CASA-2026-' + String(orders.length + 1).padStart(4, '0');
+}
+
+const form = document.getElementById('orderForm');
+
+form.addEventListener('submit', function(e) {
+  e.preventDefault();
+
+  const tracking = generateTracking();
+
+  const order = {
+    tracking,
+    name: document.getElementById('name').value,
+    phone: document.getElementById('phone').value,
+    address: document.getElementById('address').value,
+    quartier: document.getElementById('quartier').value,
+    blankets: document.getElementById('blankets').value,
+    size: document.getElementById('size').value,
+    pickupDate: document.getElementById('pickupDate').value,
+    pickupTime: document.getElementById('pickupTime').value,
+    notes: document.getElementById('notes').value,
+    payment: document.querySelector('input[name="payment"]:checked').value,
+    status: 'Commande reçue',
+    beforePhoto: '',
+    afterPhoto: ''
+  };
+
+  orders.unshift(order);
+  localStorage.setItem('mantaOrders', JSON.stringify(orders));
+
+  document.getElementById('confirmation').classList.remove('hidden');
+  document.getElementById('trackingNumber').innerText = tracking;
+
+  const msg = `Salam, nouvelle commande.%0A%0ATracking: ${tracking}%0ANom: ${order.name}%0ATéléphone: ${order.phone}%0AAdresse: ${order.address}%0AQuartier: ${order.quartier}%0ANombre de mantas: ${order.blankets}%0ATaille: ${order.size}%0ADate: ${order.pickupDate}%0AHeure: ${order.pickupTime}`;
+
+  document.getElementById('whatsappBtn').href = `https://wa.me/212600000000?text=${msg}`;
+
+  renderOrders();
+
+  form.reset();
+});
+
+function trackOrder() {
+  const tracking = document.getElementById('trackingInput').value;
+
+  const order = orders.find(o => o.tracking === tracking);
+
+  if(!order) {
+    alert('Commande introuvable');
+    return;
+  }
+
+  document.getElementById('trackingResult').classList.remove('hidden');
+
+  document.getElementById('resultTracking').innerText = order.tracking;
+  document.getElementById('statusBadge').innerText = order.status;
+
+  if(order.beforePhoto) {
+    document.getElementById('beforePreview').src = order.beforePhoto;
+  }
+
+  if(order.afterPhoto) {
+    document.getElementById('afterPreview').src = order.afterPhoto;
+  }
+}
+
+function renderOrders() {
+
+  const container = document.getElementById('ordersContainer');
+
+  container.innerHTML = '';
+
+  orders.forEach((order, index) => {
+
+    const card = document.createElement('div');
+
+    card.className = 'bg-slate-50 rounded-[2rem] p-6';
+
+    card.innerHTML = `
+
+      <div class="flex items-center justify-between flex-wrap gap-4">
+
+        <div>
+          <h3 class="text-2xl font-black">${order.tracking}</h3>
+          <p class="text-slate-600 mt-2">${order.name} — ${order.phone}</p>
+          <p class="text-slate-500 mt-1">${order.address}</p>
+        </div>
+
+        <a href="https://wa.me/212600000000" target="_blank" class="bg-green-600 text-white px-5 py-3 rounded-2xl font-black">
+          WhatsApp
+        </a>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-6 mt-8">
+
+        <div>
+          <label class="block font-black mb-2">Changer statut</label>
+
+          <select onchange="updateStatus(${index}, this.value)" class="w-full rounded-2xl px-5 py-4 border border-slate-200">
+            <option ${order.status === 'Commande reçue' ? 'selected' : ''}>Commande reçue</option>
+            <option ${order.status === 'Confirmation WhatsApp' ? 'selected' : ''}>Confirmation WhatsApp</option>
+            <option ${order.status === 'Pickup scheduled' ? 'selected' : ''}>Pickup scheduled</option>
+            <option ${order.status === 'Washing' ? 'selected' : ''}>Washing</option>
+            <option ${order.status === 'Drying' ? 'selected' : ''}>Drying</option>
+            <option ${order.status === 'Out for delivery' ? 'selected' : ''}>Out for delivery</option>
+            <option ${order.status === 'Delivered' ? 'selected' : ''}>Delivered</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block font-black mb-2">Photo avant</label>
+          <input type="file" onchange="uploadPhoto(event, ${index}, 'before')" class="w-full bg-white rounded-2xl p-4 border border-slate-200">
+        </div>
+
+        <div>
+          <label class="block font-black mb-2">Photo après</label>
+          <input type="file" onchange="uploadPhoto(event, ${index}, 'after')" class="w-full bg-white rounded-2xl p-4 border border-slate-200">
+        </div>
+
+      </div>
+
+    `;
+
+    container.appendChild(card);
+  });
+}
+
+function updateStatus(index, value) {
+  orders[index].status = value;
+  localStorage.setItem('mantaOrders', JSON.stringify(orders));
+}
+
+function uploadPhoto(event, index, type) {
+
+  const file = event.target.files[0];
+
+  if(!file) return;
+
+  const reader = new FileReader();
+
+  reader.onload = function(e) {
+
+    if(type === 'before') {
+      orders[index].beforePhoto = e.target.result;
+    } else {
+      orders[index].afterPhoto = e.target.result;
     }
 
-    function stopVoice() {
-        if(activeCall) { activeCall.close(); activeCall=null; }
-        if(activeStream) { activeStream.getTracks().forEach(t=>t.stop()); activeStream=null; }
-        if(activePeer) { /* keep peer for data, but close call */ }
-    }
+    localStorage.setItem('mantaOrders', JSON.stringify(orders));
+  }
 
-    async function setupVoiceForMultiplayer(isHost, roomCode, onReady) {
-        if(!roomCode) return;
-        if(activePeer) {
-            activePeer.destroy();
-            activePeer=null;
-        }
-        activePeer = new Peer(isHost ? 'gm_'+roomCode : undefined);
-        activePeer.on('open', async () => {
-            let stream = await requestMic();
-            if(!stream) { if(onReady) onReady(false); return; }
-            if(isHost) {
-                activePeer.on('call', call => {
-                    call.answer(stream);
-                    call.on('stream', remoteStream => {
-                        let audio = new Audio();
-                        audio.srcObject = remoteStream;
-                        audio.autoplay = true;
-                        audio.play();
-                    });
-                    activeCall = call;
-                    if(onReady) onReady(true);
-                });
-            } else {
-                let targetId = 'gm_'+roomCode;
-                let call = activePeer.call(targetId, stream);
-                call.on('stream', remoteStream => {
-                    let audio = new Audio();
-                    audio.srcObject = remoteStream;
-                    audio.autoplay = true;
-                    audio.play();
-                });
-                activeCall = call;
-                if(onReady) onReady(true);
-            }
-        });
-    }
+  reader.readAsDataURL(file);
+}
 
-    // ---------- ROUTER: charge chaque jeu avec ses propres modes (IA / Online)
-    function loadGame(gameId) {
-        const roomDiv = document.getElementById('game-dynamic-room');
-        roomDiv.innerHTML = ''; // reset
-        roomDiv.classList.add('active');
-        document.getElementById('mainHub').style.display = 'none';
-        currentGameId = gameId;
+renderOrders();
 
-        // header commun
-        const header = document.createElement('div');
-        header.className = 'room-header';
-        header.innerHTML = `
-            <button class="back-home" onclick="closeGameRoom()">🏠 رجوع للصالة</button>
-            <div class="game-title">🎮 ${getGameTitle(gameId)}</div>
-            <div class="online-zone">
-                <input type="text" id="roomCodeInput" placeholder="كود" maxlength="6">
-                <button class="btn-gold" id="createRoomBtn">✨ إنشاء غرفة + صوت</button>
-                <button class="btn-outline-gold" id="joinRoomBtn">🔗 انضم بالكود</button>
-                <button class="vs-ai" id="vsAiBtn">🤖 ضد الكمبيوتر (محلي)</button>
-            </div>
-            <div class="voice-badge" id="voiceStatusBadge">🔴 الصوت غير نشط</div>
-        `;
-        roomDiv.appendChild(header);
-        const canvasWrapper = document.createElement('div');
-        canvasWrapper.className = 'game-canvas-container';
-        const canvas = document.createElement('canvas');
-        canvas.id = `canvas_${gameId}`;
-        canvasWrapper.appendChild(canvas);
-        roomDiv.appendChild(canvasWrapper);
-        const statusDiv = document.createElement('div');
-        statusDiv.className = 'game-status';
-        statusDiv.id = `status_${gameId}`;
-        roomDiv.appendChild(statusDiv);
-
-        // init game logic (canvas dimensions dynamique)
-        switch(gameId){
-            case 'dama': initDamaGame(canvas, statusDiv); break;
-            case 'karta': initKartaMaroc(canvas, statusDiv); break;
-            case 'billiard': initBilliardPro(canvas, statusDiv); break;
-            case 'tictac': initTicTacPro(canvas, statusDiv); break;
-            case 'racing': initRacingPro(canvas, statusDiv); break;
-            case 'fighting': initFightingPs(canvas, statusDiv); break;
-        }
-
-        // online buttons
-        document.getElementById('createRoomBtn').onclick = async () => {
-            let code = Math.random().toString(36).substr(2,6).toUpperCase();
-            document.getElementById('roomCodeInput').value = code;
-            await setupVoiceForMultiplayer(true, code, (ok) => {
-                document.getElementById('voiceStatusBadge').innerHTML = ok ? "🎙️ صوت حي متصل" : "❌ فشل الصوت";
-            });
-            statusDiv.innerText = `✅ غرفة ${code} - انتظر صديقك ثم سيظهر اتصال اللعبة`;
-            // انتظار اتصال data connection من الطرف الآخر (للسيطرة على اللعبة)
-            activePeer.on('connection', conn => { activeConn = conn; setupGameDataListener(gameId, statusDiv); });
-        };
-        document.getElementById('joinRoomBtn').onclick = async () => {
-            let code = document.getElementById('roomCodeInput').value.trim().toUpperCase();
-            if(!code) return;
-            await setupVoiceForMultiplayer(false, code, (ok) => {
-                document.getElementById('voiceStatusBadge').innerHTML = ok ? "🎙️ صوت حي نشط" : "⚠️ صوت غير متاح";
-            });
-            activeConn = activePeer.connect('gm_'+code);
-            activeConn.on('open', () => { setupGameDataListener(gameId, statusDiv); });
-        };
-        document.getElementById('vsAiBtn').onclick = () => {
-            if(activePeer) activePeer.destroy();
-            stopVoice();
-            document.getElementById('voiceStatusBadge').innerHTML = "🤖 وضع ضد الكمبيوتر - بدون صوت";
-            statusDiv.innerText += " | لعبة محلية";
-            if(window._aiMode) window._aiMode(gameId, statusDiv);
-        };
-    }
-
-    function setupGameDataListener(gameId, statusDiv) {
-        if(!activeConn) return;
-        activeConn.on('data', (data) => {
-            if(gameId === 'dama') window.damaHandleRemote?.(data);
-            else if(gameId === 'karta') window.kartaHandleRemote?.(data);
-            else if(gameId === 'billiard') window.billiardRemote?.(data);
-            else if(gameId === 'tictac') window.tttRemote?.(data);
-            else if(gameId === 'racing') window.racingRemote?.(data);
-            else if(gameId === 'fighting') window.fightRemote?.(data);
-        });
-    }
-
-    function getGameTitle(id){
-        const titles = { dama:"دامة مغربية", karta:"كارطة الجبن (زرواط)", billiard:"بلياردو فاخر", tictac:"إكس أو", racing:"سباق الدار البيضاء", fighting:"قتال PS" };
-        return titles[id];
-    }
-
-    window.closeGameRoom = () => {
-        if(activePeer) { activePeer.destroy(); activePeer=null; }
-        stopVoice();
-        document.getElementById('game-dynamic-room').classList.remove('active');
-        document.getElementById('mainHub').style.display = 'block';
-        currentGameId = null;
-    };
-
-    // ********************************** GAME 1: DAMA MAGHREBIYA (complete with king, capture) ********************************
-    function initDamaGame(canvas, statusDiv) {
-        const N=8, EMPTY=0, DARK=1, LIGHT=2, DARK_K=3, LIGHT_K=4;
-        let board=[], curPlayer=DARK, selected=null, validMoves=[], mustCapture=false, chainPiece=null;
-        function initBoard(){ board=Array(N).fill().map(()=>Array(N).fill(EMPTY)); for(let r=0;r<3;r++)for(let c=0;c<N;c++)if((r+c)%2)board[r][c]=DARK; for(let r=5;r<8;r++)for(let c=0;c<N;c++)if((r+c)%2)board[r][c]=LIGHT; }
-        function isDark(p){return p===DARK||p===DARK_K;} function isLight(p){return p===LIGHT||p===LIGHT_K;} function isKing(p){return p===DARK_K||p===LIGHT_K;}
-        function isCur(p){return curPlayer===DARK?isDark(p):isLight(p);} function isOpp(p){return curPlayer===DARK?isLight(p):isDark(p);}
-        function getMoves(r,c,capOnly=false){ /* simplified but full capture */ let moves=[]; let dirs= isKing(board[r][c])?[[1,1],[1,-1],[-1,1],[-1,-1]]:(board[r][c]===DARK?[[1,1],[1,-1]]:[[-1,1],[-1,-1]]); for(let [dr,dc] of dirs){ let nr=r+dr,nc=c+dc; if(!capOnly && !mustCapture && inB(nr,nc) && board[nr][nc]===EMPTY) moves.push({r:nr,c:nc,type:'mv'}); let jr=r+2*dr,jc=c+2*dc; if(inB(jr,jc) && inB(nr,nc) && isOpp(board[nr][nc]) && board[jr][jc]===EMPTY) moves.push({r:jr,c:jc,cap:[nr,nc],type:'cap'}); } return moves; }
-        function inB(r,c){return r>=0&&r<N&&c>=0&&c<N;}
-        function hasCapture(){for(let r=0;r<N;r++)for(let c=0;c<N;c++)if(isCur(board[r][c])&&getMoves(r,c,true).length) return true; return false;}
-        function computeValid(r,c){mustCapture=hasCapture(); if(mustCapture){ let caps=getMoves(r,c,true); if(caps.length) return caps; else return []; } return getMoves(r,c);}
-        let ctx = canvas.getContext('2d'); canvas.width=560; canvas.height=560; let cell=70;
-        function draw(){ ctx.clearRect(0,0,560,560); for(let r=0;r<N;r++) for(let c=0;c<N;c++){ ctx.fillStyle=(r+c)%2?'#a55d35':'#f3cf9a'; ctx.fillRect(c*cell,r*cell,cell,cell); if(board[r][c]){ let x=c*cell+cell/2,y=r*cell+cell/2,rad=cell*0.35; let grad=ctx.createRadialGradient(x-5,y-5,5,x,y,rad); grad.addColorStop(0,isDark(board[r][c])?'#444':'#f9f3e0'); grad.addColorStop(1,isDark(board[r][c])?'#111':'#d6b575'); ctx.beginPath();ctx.arc(x,y,rad,0,Math.PI*2);ctx.fillStyle=grad;ctx.fill(); if(isKing(board[r][c])){ ctx.font=`bold ${rad+8}px serif`; ctx.fillStyle='#ffd966'; ctx.fillText('♛',x-10,y+6); } } } if(selected){ ctx.strokeStyle='#ffb347'; ctx.lineWidth=4; ctx.strokeRect(selected[1]*cell,selected[0]*cell,cell,cell); } validMoves.forEach(m=>{ ctx.beginPath(); ctx.arc(m.c*cell+cell/2,m.r*cell+cell/2,cell*0.2,0,Math.PI*2); ctx.fillStyle=m.type==='cap'?'#ef476fcc':'#06d6a0cc'; ctx.fill(); }); }
-        function executeMove(fr,fc,mv){ let piece=board[fr][fc]; board[fr][fc]=EMPTY; if(mv.cap){ board[mv.cap[0]][mv.cap[1]]=EMPTY; } board[mv.r][mv.c]=piece; if(piece===DARK && mv.r===N-1) board[mv.r][mv.c]=DARK_K; if(piece===LIGHT && mv.r===0) board[mv.r][mv.c]=LIGHT_K; selected=null; validMoves=[]; if(mv.cap){ let more=getMoves(mv.r,mv.c,true); if(more.length){ chainPiece=[mv.r,mv.c]; selected=[mv.r,mv.c]; validMoves=more; draw(); statusDiv.innerText="🔥 واصل الأكل!"; return; } } chainPiece=null; curPlayer=curPlayer===DARK?LIGHT:DARK; let winner=checkWinner(); if(winner) statusDiv.innerText=winner+" فاز!"; else statusDiv.innerText=`دور ${curPlayer===DARK?'الداكن':'الفاتح'}`; draw(); }
-        function checkWinner(){ let d=0,l=0; for(let r=0;r<N;r++)for(let c=0;c<N;c++){ if(isDark(board[r][c])) d++; if(isLight(board[r][c])) l++; } return d===0?"الفاتح":l===0?"الداكن":null; }
-        canvas.onclick=(e)=>{ let rect=canvas.getBoundingClientRect(), sx=(e.clientX-rect.left)*canvas.width/rect.width, sy=(e.clientY-rect.top)*canvas.height/rect.height; let r=Math.floor(sy/cell),c=Math.floor(sx/cell); if(!inB(r,c)) return; if(chainPiece){ let mv=validMoves.find(m=>m.r===r&&m.c===c); if(mv) executeMove(chainPiece[0],chainPiece[1],mv); return; } if(selected){ let mv=validMoves.find(m=>m.r===r&&m.c===c); if(mv){ executeMove(selected[0],selected[1],mv); return; } else{ selected=null; draw(); } } if(isCur(board[r][c])){ let moves=computeValid(r,c); if(moves.length){ selected=[r,c]; validMoves=moves; draw(); statusDiv.innerText="اختر وجهة"; } else statusDiv.innerText="لا حركات متاحة"; } else{ statusDiv.innerText="ليست قطعتك"; } }; initBoard(); draw(); window.damaHandleRemote=(data)=>{ executeMove(data.fr,data.fc,data.mv); draw(); }; if(window._aiMode) window._aiMode=null;
-    }
-    // ********************************** GAME 2: KARTA MAROC (زرواط - لعبة الطاولة المغربية) elegante ********************************
-    function initKartaMaroc(canvas, statusDiv){ canvas.width=600; canvas.height=400; let ctx=canvas.getContext('2d'); let pieces=[{x:80,y:180,player:1},{x:520,y:180,player:2}]; let turn=1; function draw(){ ctx.clearRect(0,0,600,400); ctx.fillStyle='#2c5e2a'; ctx.fillRect(0,0,600,400); ctx.fillStyle='#ddbb77'; for(let i=0;i<4;i++) ctx.fillRect(50+i*140,150,80,80); pieces.forEach(p=>{ ctx.beginPath(); ctx.arc(p.x,p.y,25,0,Math.PI*2); ctx.fillStyle=p.player===1?'#f0c674':'#a52a1a'; ctx.fill(); ctx.fillStyle='white'; ctx.font='20px monospace'; ctx.fillText(p.player===1?'⚫':'⚪',p.x-10,p.y+8); }); statusDiv.innerText=`دور اللاعب ${turn===1?'الأسود':'الأحمر'}  |  انقر فوق قطعتك ثم على خانة فارغة`; } let selectedPiece=null; canvas.onclick=(e)=>{ let rect=canvas.getBoundingClientRect(), sx=(e.clientX-rect.left)*canvas.width/rect.width, sy=(e.clientY-rect.top)*canvas.height/rect.height; if(selectedPiece){ let index=pieces.findIndex(p=>p.x===selectedPiece.x&&p.y===selectedPiece.y); if(index!==-1){ pieces[index].x=Math.min(550,Math.max(50,sx)); pieces[index].y=Math.min(340,Math.max(150,sy)); } selectedPiece=null; turn= turn===1?2:1; draw(); } else{ let hit=pieces.find(p=>Math.hypot(p.x-sx,p.y-sy)<30 && p.player===turn); if(hit) selectedPiece=hit; else statusDiv.innerText="ليس دورك أو خطأ"; } }; draw(); window.kartaHandleRemote=()=>{}; }
-    // ********************************** GAME 3: BILLIARD PRO (pockets) ********************************
-    function initBilliardPro(canvas, statusDiv){ canvas.width=800; canvas.height=500; let ctx=canvas.getContext('2d'); let balls=[{x:400,y:250,r:10,vx:0,vy:0,color:'white'},{x:550,y:120,r:10,vx:0,vy:0,color:'red'},{x:570,y:140,r:10,vx:0,vy:0,color:'blue'},{x:610,y:100,r:10,vx:0,vy:0,color:'green'}]; let pockets=[[30,30],[770,30],[30,470],[770,470],[400,30],[400,470]]; let turn=0; function draw(){ ctx.fillStyle='#1f6a3a'; ctx.fillRect(0,0,800,500); ctx.fillStyle='#ad8b5b'; for(let p of pockets) ctx.beginPath(),ctx.arc(p[0],p[1],15,0,Math.PI*2),ctx.fill(); balls.forEach(b=>{ctx.beginPath();ctx.arc(b.x,b.y,b.r,0,Math.PI*2);ctx.fillStyle=b.color;ctx.fill();}); statusDiv.innerText=`دور اللاعب ${turn===0?'أبيض':'ألوان'} | اسحب بالماوس فوق الكرة البيضاء`; } let dragging=false,startX,startY; canvas.onmousedown=(e)=>{ let rect=canvas.getBoundingClientRect(), mx=(e.clientX-rect.left)*canvas.width/rect.width, my=(e.clientY-rect.top)*canvas.height/rect.height; let white=balls[0]; if(Math.hypot(mx-white.x,my-white.y)<15 && turn===0){ dragging=true; startX=mx; startY=my; } }; canvas.onmousemove=(e)=>{ if(dragging){ let rect=canvas.getBoundingClientRect(), mx=(e.clientX-rect.left)*canvas.width/rect.width, my=(e.clientY-rect.top)*canvas.height/rect.height; draw(); ctx.beginPath(); ctx.moveTo(startX,startY); ctx.lineTo(mx,my); ctx.strokeStyle='gold'; ctx.stroke(); } }; canvas.onmouseup=(e)=>{ if(dragging){ let rect=canvas.getBoundingClientRect(), mx=(e.clientX-rect.left)*canvas.width/rect.width, my=(e.clientY-rect.top)*canvas.height/rect.height; let dx=startX-mx, dy=startY-my; let force=Math.min(12,Math.hypot(dx,dy)/4); balls[0].vx=dx*force; balls[0].vy=dy*force; dragging=false; turn=1; requestAnimationFrame(physics); } }; function physics(){ let moving=false; balls.forEach(b=>{b.x+=b.vx; b.y+=b.vy; b.vx*=0.98; b.vy*=0.98; if(Math.abs(b.vx)>0.05) moving=true; if(b.x<15||b.x>785){b.vx*=-0.7; b.x=Math.min(785,Math.max(15,b.x));} if(b.y<15||b.y>485){b.vy*=-0.7; b.y=Math.min(485,Math.max(15,b.y));} pockets.forEach(p=>{if(Math.hypot(b.x-p[0],b.y-p[1])<20) {b.x=-100;b.y=-100;}});}); for(let i=0;i<balls.length;i++)for(let j=i+1;j<balls.length;j++){ let dx=balls[i].x-balls[j].x,dy=balls[i].y-balls[j].y,dist=Math.hypot(dx,dy); if(dist<balls[i].r+balls[j].r){ let ang=Math.atan2(dy,dx), m1=(balls[i].vx*Math.cos(ang)+balls[i].vy*Math.sin(ang)), m2=(balls[j].vx*Math.cos(ang)+balls[j].vy*Math.sin(ang)), p=2*(m1-m2)/(balls[i].r+balls[j].r); balls[i].vx-=p*Math.cos(ang)*balls[j].r; balls[i].vy-=p*Math.sin(ang)*balls[j].r; balls[j].vx+=p*Math.cos(ang)*balls[i].r; balls[j].vy+=p*Math.sin(ang)*balls[i].r; } } draw(); if(moving) requestAnimationFrame(physics); else turn=0; } draw(); window.billiardRemote=()=>{}; }
-    // ************ TICTACTOE PREMIUM **********
-    function initTicTacPro(canvas, statusDiv){ canvas.width=450; canvas.height=450; let ctx=canvas.getContext('2d'); let board=Array(9).fill(null); let turn='X'; function draw(){ ctx.clearRect(0,0,450,450); ctx.strokeStyle='#FFD966'; for(let i=1;i<3;i++){ ctx.beginPath(); ctx.moveTo(i*150,0); ctx.lineTo(i*150,450); ctx.stroke(); ctx.beginPath(); ctx.moveTo(0,i*150); ctx.lineTo(450,i*150); ctx.stroke(); } for(let i=0;i<9;i++){ let x=(i%3)*150+75, y=Math.floor(i/3)*150+75; if(board[i]){ ctx.font='bold 70px monospace'; ctx.fillStyle=board[i]=='X'?'#4ade80':'#f97316'; ctx.fillText(board[i],x-35,y+25); } } statusDiv.innerText=`دور ${turn}`; } canvas.onclick=(e)=>{ let rect=canvas.getBoundingClientRect(), sx=(e.clientX-rect.left)*canvas.width/rect.width,sy=(e.clientY-rect.top)*canvas.height/rect.height; let idx=Math.floor(sy/150)*3+Math.floor(sx/150); if(board[idx]===null){ board[idx]=turn; let win=checkWin(); if(win) statusDiv.innerText=`${win} فاز!`; else turn=turn=='X'?'O':'X'; draw(); } }; function checkWin(){ let lines=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]]; for(let l of lines) if(board[l[0]]&&board[l[0]]===board[l[1]]&&board[l[1]]===board[l[2]]) return board[l[0]]; return null; } draw(); window.tttRemote=()=>{}; }
-    // ************ RACING PRO 10 levels ************
-    function initRacingPro(canvas, statusDiv){ canvas.width=800; canvas.height=500; let ctx=canvas.getContext('2d'); let car1={x:100,y:250},car2={x:680,y:250}, obstacles=[], level=1; function generateLevel(){ obstacles=[]; for(let i=0;i<5+level;i++) obstacles.push({x:Math.random()*700,y:Math.random()*400,w:35,h:35,type:Math.random()>0.5?'taxi':'police'}); draw(); } function draw(){ ctx.fillStyle='#202b2f'; ctx.fillRect(0,0,800,500); ctx.fillStyle='#aaaaaa'; for(let i=0;i<20;i++) ctx.fillRect(0,i*25,800,3); obstacles.forEach(o=>{ ctx.fillStyle=o.type=='taxi'?'#e63946':'#3498db'; ctx.fillRect(o.x,o.y,o.w,o.h); }); ctx.fillStyle='#2299ff'; ctx.fillRect(car1.x,car1.y,40,60); ctx.fillStyle='#dd3333'; ctx.fillRect(car2.x,car2.y,40,60); statusDiv.innerText=`المستوى ${level} | أزرق: أزرار ↑↓←→ | أحمر: WASD | تجنب السيارات`; } let keys={}; window.addEventListener('keydown',(e)=>{ if(e.key=='ArrowUp') car1.y-=12; if(e.key=='ArrowDown') car1.y+=12; if(e.key=='ArrowLeft') car1.x-=12; if(e.key=='ArrowRight') car1.x+=12; if(e.key=='w') car2.y-=12; if(e.key=='s') car2.y+=12; if(e.key=='a') car2.x-=12; if(e.key=='d') car2.x+=12; car1.x=Math.min(740,Math.max(20,car1.x)); car1.y=Math.min(420,Math.max(20,car1.y)); car2.x=Math.min(740,Math.max(20,car2.x)); car2.y=Math.min(420,Math.max(20,car2.y)); draw(); if(obstacles.some(o=>Math.abs(car1.x-o.x)<40 && Math.abs(car1.y-o.y)<50)) alert('السيارة الزرقاء تصادمت! إعادة المستوى'); if(obstacles.some(o=>Math.abs(car2.x-o.x)<40 && Math.abs(car2.y-o.y)<50)) alert('السيارة الحمراء تصادمت! إعادة'); }); document.getElementById('nextLevelBtn')?.remove(); let btn=document.createElement('button'); btn.innerText="المستوى التالي +"; btn.onclick=()=>{if(level<10){level++;generateLevel();}else alert("أنت بطل!");}; btn.style.background="#facc15"; btn.style.margin="10px auto"; btn.style.display="block"; canvas.parentNode.appendChild(btn); generateLevel(); window.racingRemote=()=>{}; }
-    // ************ FIGHTING WITH PLAYSTATION BUTTONS ************
-    function initFightingPs(canvas, statusDiv){ canvas.width=800; canvas.height=400; let ctx=canvas.getContext('2d'); let hp1=100, hp2=100; function draw(){ ctx.fillStyle='#1e1a2f'; ctx.fillRect(0,0,800,400); ctx.fillStyle='#c0392b'; ctx.fillRect(50,30, hp2*3, 25); ctx.fillStyle='#2c3e50'; ctx.fillRect(750-hp1*3,30, hp1*3, 25); ctx.font='bold 24px monospace'; ctx.fillStyle='#f1c40f'; ctx.fillText("P1 △ □ ○ X", 30, 100); ctx.fillText("P2 L1 R1", 650, 100); ctx.fillStyle='white'; ctx.fillText("❤️", 30, 50); ctx.fillText("❤️", 750, 50); statusDiv.innerText="استخدم أزرار △ □ ○ X للاعب الأيسر | L1,R1 للاعب الأيمن"; } window.addEventListener('keydown',(e)=>{ if(e.key=='ArrowUp'||e.key=='ArrowRight') hp2-=15; if(e.key=='ArrowLeft'||e.key=='ArrowDown') hp2-=10; if(e.key=='l'||e.key=='r') hp1-=15; if(e.key=='1'||e.key=='2') hp1-=10; hp1=Math.max(0,hp1); hp2=Math.max(0,hp2); draw(); if(hp1<=0) statusDiv.innerText="اللاعب الأيمن فاز!"; if(hp2<=0) statusDiv.innerText="اللاعب الأيسر فاز!"; }); draw(); window.fightRemote=()=>{}; }
-
-    // event listeners for game selection
-    document.querySelectorAll('.game-card').forEach(card=>{
-        card.addEventListener('click',()=>loadGame(card.dataset.game));
-    });
-</script>
-</body>
+</script></body>
 </html>
